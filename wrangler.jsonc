@@ -1,0 +1,48 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "tanstack-start-app",
+	"compatibility_date": "2025-09-24",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"main": "@tanstack/react-start/server-entry",
+	"env": {
+		"production": {
+			"observability": {
+				"enabled": true,
+			},
+			"vars": {
+				"BETTER_AUTH_URL": "https://tanstack-start-app-production.98-axel-andre-482.workers.dev",
+			},
+			"d1_databases": [
+				{
+					"binding": "db_app",
+					"database_name": "db_app",
+					"database_id": "e59c2c60-c996-49f5-8871-dd78c51e06d1",
+					"preview_database_id": "local-test-db",
+				}
+			],
+		},
+		"development": {
+			"vars": {
+				"BETTER_AUTH_URL": "http://localhost:3000",
+			},
+			"d1_databases": [
+				{
+					"binding": "db_app",
+					"database_name": "db_app",
+					"database_id": "e59c2c60-c996-49f5-8871-dd78c51e06d1",
+					"preview_database_id": "local-test-db",
+				}
+			],
+		},
+	},
+	"d1_databases": [
+		{
+			"binding": "db_app",
+			"database_name": "db_app",
+			"database_id": "e59c2c60-c996-49f5-8871-dd78c51e06d1",
+			"preview_database_id": "local-test-db",
+		}
+	],
+}
