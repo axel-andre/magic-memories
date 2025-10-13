@@ -1,4 +1,5 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
 import { Compass, Heart, LogOut, Plus, Settings, Share, User } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
@@ -11,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { authClient } from '~/utils/auth'
+import { CreateMemoryModal } from './CreateMemoryModal'
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -18,6 +20,8 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
     const session = authClient.useSession()
+    const navigate = useNavigate()
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
     const handleSignOut = async () => {
         await authClient.signOut()
@@ -36,7 +40,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="sticky top-4 z-50 w-fit mx-auto border rounded-md bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <header className="sticky top-4 z-50 w-fit mx-auto rounded-md backdrop-blur bg-white/30">
                 <div className="container flex h-16 items-center justify-between px-4">
                     <div className="flex items-center gap-6 mr-4">
                         <nav className="hidden md:flex items-center gap-4">
@@ -58,9 +62,18 @@ export function AppLayout({ children }: AppLayoutProps) {
                         </nav>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button size="default">
-                            <Plus className="   h-4 w-4" />
-                            <Link to="/sign-up">Share my memories</Link>
+                        <Button
+                            size="default"
+                            onClick={() => {
+                                if (session.data) {
+                                    setIsCreateModalOpen(true)
+                                } else {
+                                    navigate({ to: '/sign-up' })
+                                }
+                            }}
+                        >
+                            <Plus className="h-4 w-4" />
+                            Share my memories
                         </Button>
                     </div>
                     {/* Profile Section */}
@@ -111,6 +124,12 @@ export function AppLayout({ children }: AppLayoutProps) {
 
             {/* Main Content */}
             <main className="container mx-auto px-4 py-6">{children}</main>
+
+            {/* Create Memory Modal */}
+            <CreateMemoryModal
+                open={isCreateModalOpen}
+                onOpenChange={setIsCreateModalOpen}
+            />
         </div>
     )
 }

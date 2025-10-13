@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MemoryLanesIdRouteImport } from './routes/memory-lanes/$id'
+import { Route as MemoryLanesIdEditRouteImport } from './routes/memory-lanes/$id.edit'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const SignUpRoute = SignUpRouteImport.update({
@@ -29,6 +31,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MemoryLanesIdRoute = MemoryLanesIdRouteImport.update({
+  id: '/memory-lanes/$id',
+  path: '/memory-lanes/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemoryLanesIdEditRoute = MemoryLanesIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => MemoryLanesIdRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -39,33 +51,59 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/memory-lanes/$id': typeof MemoryLanesIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/memory-lanes/$id/edit': typeof MemoryLanesIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/memory-lanes/$id': typeof MemoryLanesIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/memory-lanes/$id/edit': typeof MemoryLanesIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/memory-lanes/$id': typeof MemoryLanesIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/memory-lanes/$id/edit': typeof MemoryLanesIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sign-in' | '/sign-up' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/sign-in'
+    | '/sign-up'
+    | '/memory-lanes/$id'
+    | '/api/auth/$'
+    | '/memory-lanes/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sign-in' | '/sign-up' | '/api/auth/$'
-  id: '__root__' | '/' | '/sign-in' | '/sign-up' | '/api/auth/$'
+  to:
+    | '/'
+    | '/sign-in'
+    | '/sign-up'
+    | '/memory-lanes/$id'
+    | '/api/auth/$'
+    | '/memory-lanes/$id/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/sign-in'
+    | '/sign-up'
+    | '/memory-lanes/$id'
+    | '/api/auth/$'
+    | '/memory-lanes/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  MemoryLanesIdRoute: typeof MemoryLanesIdRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -92,6 +130,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/memory-lanes/$id': {
+      id: '/memory-lanes/$id'
+      path: '/memory-lanes/$id'
+      fullPath: '/memory-lanes/$id'
+      preLoaderRoute: typeof MemoryLanesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/memory-lanes/$id/edit': {
+      id: '/memory-lanes/$id/edit'
+      path: '/edit'
+      fullPath: '/memory-lanes/$id/edit'
+      preLoaderRoute: typeof MemoryLanesIdEditRouteImport
+      parentRoute: typeof MemoryLanesIdRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -102,10 +154,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface MemoryLanesIdRouteChildren {
+  MemoryLanesIdEditRoute: typeof MemoryLanesIdEditRoute
+}
+
+const MemoryLanesIdRouteChildren: MemoryLanesIdRouteChildren = {
+  MemoryLanesIdEditRoute: MemoryLanesIdEditRoute,
+}
+
+const MemoryLanesIdRouteWithChildren = MemoryLanesIdRoute._addFileChildren(
+  MemoryLanesIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  MemoryLanesIdRoute: MemoryLanesIdRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

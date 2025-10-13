@@ -44,8 +44,8 @@ function SignIn() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <Card className="w-full max-w-md">
+        <div className="min-h-screen flex justify-center p-4">
+            <Card className="w-full max-w-md bg-white h-fit mt-10">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
                     <CardDescription>

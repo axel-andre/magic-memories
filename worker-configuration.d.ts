@@ -6336,7 +6336,7 @@ interface BasicImageTransformations {
     /**
      * Background color to add underneath the image. Applies only to images with
      * transparency (such as PNG). Accepts any CSS color (#RRGGBB, rgba(…),
-     * hsl(…), etc.)
+     * …), etc.
      */
     background?: string;
     /**
