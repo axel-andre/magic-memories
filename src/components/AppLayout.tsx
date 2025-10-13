@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { LogOut, Settings, User } from 'lucide-react'
+import { Compass, Heart, LogOut, Plus, Settings, Share, User } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import {
@@ -36,28 +36,35 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <header className="sticky top-4 z-50 w-fit mx-auto border rounded-md bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container flex h-16 items-center justify-between px-4">
-                    <div className="flex items-center gap-6">
-                        <Link to="/" className="flex items-center space-x-2">
-                            <span className="text-xl font-bold">MyApp</span>
-                        </Link>
+                    <div className="flex items-center gap-6 mr-4">
                         <nav className="hidden md:flex items-center gap-4">
-                            <Link
-                                to="/"
-                                className="text-sm font-medium transition-colors hover:text-primary"
-                                activeProps={{
-                                    className: 'text-primary',
-                                }}
-                                activeOptions={{ exact: true }}
-                            >
-                                Home
-                            </Link>
+                            <Button size="default" variant='ghost'>
+                                <Compass className="h-4 w-4" />
+                                <Link to="/">
+
+                                    Explore
+                                </Link>
+                            </Button>
+                            {session.data ? (
+                                <Button size="default" variant='ghost'>
+                                    <Heart className=" h-4 w-4" />
+                                    <Link to="/">
+
+                                        My Memory Lanes</Link>
+                                </Button>
+                            ) : null}
                         </nav>
                     </div>
-
+                    <div className="flex items-center gap-2">
+                        <Button size="default">
+                            <Plus className="   h-4 w-4" />
+                            <Link to="/sign-up">Share my memories</Link>
+                        </Button>
+                    </div>
                     {/* Profile Section */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 ml-4">
                         {session.data ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -97,16 +104,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
-                        ) : (
-                            <div className="flex items-center gap-2">
-                                <Button asChild variant="ghost" size="sm">
-                                    <Link to="/sign-in">Sign In</Link>
-                                </Button>
-                                <Button asChild size="sm">
-                                    <Link to="/sign-up">Sign Up</Link>
-                                </Button>
-                            </div>
-                        )}
+                        ) : null}
                     </div>
                 </div>
             </header>
