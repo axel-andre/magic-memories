@@ -45,4 +45,13 @@
 			"preview_database_id": "local-test-db",
 		}
 	],
+	"images": {
+		"binding": "IMAGES",
+	},
+	"r2_buckets": [
+		{
+			"binding": "IMAGE_BUCKET",
+			"bucket_name": "images",
+		}
+	]
 }

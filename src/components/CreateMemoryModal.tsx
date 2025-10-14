@@ -12,7 +12,7 @@ import {
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
-import { createMemoryFn, type CreateMemoryInput } from '~/utils/server/memories'
+import { createMemoryLaneFn, type CreateMemoryInput } from '~/utils/server/memories'
 
 interface CreateMemoryModalProps {
     open: boolean
@@ -27,13 +27,13 @@ export function CreateMemoryModal({ open, onOpenChange }: CreateMemoryModalProps
     const form = useForm({
         defaultValues: {
             name: '',
-        } as CreateMemoryInput,
+        },
         onSubmit: async ({ value }) => {
             setIsSubmitting(true)
             setError(null)
 
             try {
-                await createMemoryFn({
+                const newMemory = await createMemoryLaneFn({
                     data: {
                         name: value.name,
                     }
@@ -44,7 +44,7 @@ export function CreateMemoryModal({ open, onOpenChange }: CreateMemoryModalProps
                 form.reset()
 
                 // Optionally navigate or refresh data
-                navigate({ to: '/' })
+                navigate({ to: '/memory-lanes/$id/edit', params: { id: newMemory.id } })
             } catch (err: any) {
                 console.error('Error creating memory:', err)
                 setError(err.message || 'Failed to create memory. Please try again.')
@@ -56,7 +56,7 @@ export function CreateMemoryModal({ open, onOpenChange }: CreateMemoryModalProps
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] bg-white">
                 <DialogHeader>
                     <DialogTitle>Create a Memory Lane</DialogTitle>
                     <DialogDescription>
@@ -113,7 +113,7 @@ export function CreateMemoryModal({ open, onOpenChange }: CreateMemoryModalProps
 
                     {/* Error Message */}
                     {error && (
-                        <div className="p-3 border border-destructive/50 bg-destructive/10 rounded-lg">
+                        <div className="p-3 border border-destructive/50 bg-destructive/10 rounded-lg mx-auto">
                             <p className="text-sm text-destructive">{error}</p>
                         </div>
                     )}

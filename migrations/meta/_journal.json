@@ -15,6 +15,13 @@
       "when": 1760320040308,
       "tag": "0001_fluffy_shadowcat",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1760376221341,
+      "tag": "0002_volatile_rocket_racer",
+      "breakpoints": true
     }
   ]
 }

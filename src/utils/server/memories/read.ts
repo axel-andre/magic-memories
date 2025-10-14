@@ -5,7 +5,7 @@ import { auth } from "../auth";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
-import { paginationSchema, memoryIdSchema } from "./schemas";
+import { paginationSchema, memoryLaneIdSchema } from "./schemas";
 
 export const getUserMemoriesFn = createServerFn({ method: "GET" }).handler(
   async () => {
@@ -25,7 +25,16 @@ export const getUserMemoriesFn = createServerFn({ method: "GET" }).handler(
     return memories;
   }
 );
-
+export const convertMemoryImagesToUrls = <T extends { image: string }>(
+  memories: T[]
+): T[] => {
+  return memories.map((memory) => {
+    return {
+      ...memory,
+      image: `/api/files/${memory.image}`,
+    };
+  });
+};
 export const getAllMemoriesFnPaginated = createServerFn({
   method: "GET",
 })
@@ -33,27 +42,37 @@ export const getAllMemoriesFnPaginated = createServerFn({
   .handler(async ({ data }) => {
     const { page, limit } = data;
     const offset = (page - 1) * limit;
-    const memories = await db.query.memoryLane.findMany({
+    const memoryLanes = await db.query.memoryLane.findMany({
       with: {
         user: true,
+        memories: true,
       },
       where: eq(memoryLane.status, "published"),
       limit,
       offset,
     });
-    return memories;
+    memoryLanes.map((memoryLane) => {
+      if (memoryLane.memories) {
+        memoryLane.memories = convertMemoryImagesToUrls(memoryLane.memories);
+      }
+    });
+    return memoryLanes;
   });
 
 export const getMemoryByIdFn = createServerFn({ method: "GET" })
-  .inputValidator(memoryIdSchema)
+  .inputValidator(memoryLaneIdSchema)
   .handler(async ({ data }) => {
     const { id } = data;
-    const memory = await db.query.memoryLane.findFirst({
+    const memoryL = await db.query.memoryLane.findFirst({
       where: eq(memoryLane.id, id),
       with: {
         user: true,
+        memories: true,
       },
     });
-    return memory;
+    if (memoryL?.memories) {
+      memoryL.memories = convertMemoryImagesToUrls(memoryL.memories);
+    }
+    return memoryL;
   });
 

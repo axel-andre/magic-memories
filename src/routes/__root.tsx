@@ -14,10 +14,13 @@ import { NotFound } from '~/components/NotFound'
 import { AppLayout } from '~/components/AppLayout'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
+import { User } from 'better-auth'
+import { getUserBySessionFn } from '~/utils/server/users/read'
 
 
 type AppContext = {
   queryClient: QueryClient;
+  user: User | null;
 }
 export const Route = createRootRouteWithContext<AppContext>()({
   head: () => ({
@@ -63,15 +66,18 @@ export const Route = createRootRouteWithContext<AppContext>()({
     ]
   }),
   errorComponent: DefaultCatchBoundary,
+  beforeLoad: async ({ context }) => {
+    const user = await getUserBySessionFn()
+    context.user = user ?? null
+  },
   notFoundComponent: () => <NotFound />,
   shellComponent: RootDocument,
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { queryClient } = Route.useRouteContext()
-
   return (
-    <html>
+    <html className='bg-background'>
       <head>
         <HeadContent />
       </head>

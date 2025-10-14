@@ -2,7 +2,16 @@ import { relations, sql } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { user } from "./auth-schema";
 
-const status = ["draft", "published", "archived"] as const;
+const memoryLaneStatus = {
+  DRAFT: "draft",
+  PUBLISHED: "published",
+  ARCHIVED: "archived",
+} as const;
+const status = [
+  memoryLaneStatus.DRAFT,
+  memoryLaneStatus.PUBLISHED,
+  memoryLaneStatus.ARCHIVED,
+] satisfies (typeof memoryLaneStatus)[keyof typeof memoryLaneStatus][];
 export const memoryLane = sqliteTable("memory_lane", {
   id: text("id")
     .primaryKey()
@@ -19,12 +28,34 @@ export const memoryLane = sqliteTable("memory_lane", {
     .references(() => user.id, { onDelete: "cascade" }),
   status: text("status")
     .notNull()
-    .default("draft")
+    .default(memoryLaneStatus.DRAFT)
     .$type<(typeof status)[number]>(),
 });
-export const memoryLaneRelations = relations(memoryLane, ({ one }) => ({
+
+export const memory = sqliteTable("memory", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  memoryLaneId: text("memory_lane_id")
+    .notNull()
+    .references(() => memoryLane.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  image: text("image").notNull(),
+  date: integer("date", { mode: "timestamp_ms" }).notNull(),
+});
+
+export const memoryLaneRelations = relations(memoryLane, ({ one, many }) => ({
   user: one(user, {
     fields: [memoryLane.userId],
     references: [user.id],
+  }),
+  memories: many(memory),
+}));
+
+export const memoryRelations = relations(memory, ({ one }) => ({
+  memoryLane: one(memoryLane, {
+    fields: [memory.memoryLaneId],
+    references: [memoryLane.id],
   }),
 }));

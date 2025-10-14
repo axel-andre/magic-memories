@@ -32,7 +32,7 @@ export const getAllMemoriesInfiniteQueryOptions = (limit: number) => {
         },
       }),
     initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages, lastPageParam) => {
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       if (lastPage.length < limit) {
         return undefined;
       }
@@ -40,4 +40,3 @@ export const getAllMemoriesInfiniteQueryOptions = (limit: number) => {
     },
   });
 };
-

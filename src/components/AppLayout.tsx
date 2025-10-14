@@ -40,22 +40,20 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="sticky top-4 z-50 w-fit mx-auto rounded-md backdrop-blur bg-white/30">
+            <header className="sticky top-4 z-50 w-fit mx-auto rounded-md backdrop-blur bg-white^">
                 <div className="container flex h-16 items-center justify-between px-4">
                     <div className="flex items-center gap-6 mr-4">
                         <nav className="hidden md:flex items-center gap-4">
-                            <Button size="default" variant='ghost'>
-                                <Compass className="h-4 w-4" />
+                            <Button asChild size="default" variant='ghost'>
                                 <Link to="/">
-
+                                    <Compass className="h-4 w-4" />
                                     Explore
                                 </Link>
                             </Button>
                             {session.data ? (
-                                <Button size="default" variant='ghost'>
-                                    <Heart className=" h-4 w-4" />
+                                <Button asChild size="default" variant='ghost'>
                                     <Link to="/">
-
+                                        <Heart className="h-4 w-4" />
                                         My Memory Lanes</Link>
                                 </Button>
                             ) : null}

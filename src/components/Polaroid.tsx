@@ -1,5 +1,6 @@
 import * as React from "react"
-import { Card } from "~/components/ui/card"
+import { useState } from "react"
+import { Card, CardHeader, CardTitle } from "~/components/ui/card"
 import { cn } from "~/lib/utils"
 
 export interface PolaroidProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -32,6 +33,18 @@ export interface PolaroidProps extends React.HTMLAttributes<HTMLDivElement> {
    * Additional className for the caption
    */
   captionClassName?: string
+  /**
+   * Whether the polaroid is stacked
+   */
+  isStacked?: boolean
+  /**
+   * Whether the polaroid has selection
+   */
+  hasSelection?: boolean
+  /**
+   * Whether the polaroid is selected
+   */
+  isSelected?: boolean
 }
 
 const Polaroid = React.forwardRef<HTMLDivElement, PolaroidProps>(
@@ -45,6 +58,9 @@ const Polaroid = React.forwardRef<HTMLDivElement, PolaroidProps>(
       imageClassName,
       captionClassName,
       className,
+      hasSelection = false,
+      isSelected = false,
+      isStacked = false,
       ...props
     },
     ref
@@ -54,25 +70,41 @@ const Polaroid = React.forwardRef<HTMLDivElement, PolaroidProps>(
       portrait: "aspect-[3/4]",
       landscape: "aspect-[4/3]",
     }
+    const [isHovered, setIsHovered] = useState(false)
 
     return (
+      <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} className={cn("flex flex-col gap-4 relative hover:scale-105 hover:shadow-xl rounded-sm cursor-pointer transition-all", isStacked && "flex-col-reverse", {
+        [`rotate-[${rotate}deg]`]: !isStacked
+      })}>
+        {isStacked && (
+          <>
+            <div className={cn("absolute top-0 left-0 bg-white h-full w-full -rotate-3 shadow-lg transition-all", { "-rotate-6": isHovered })} >
+            </div>
+            <div className={cn("absolute top-0 left-0 bg-white h-full w-full rotate-3 shadow-lg transition-all", { "^rotate-6": isHovered })}>
+            </div>
+          </>
+        )}
       <Card
         ref={ref}
         className={cn(
-          "bg-white p-4 pb-12 shadow-lg hover:scale-105 hover:shadow-xl rounded-sm cursor-pointer transition-all",
+          `bg-white p-4 pb-12 shadow-lg hover:scale-105 rounded-sm cursor-pointer transition-all`,
+          { "rotate-[10deg]": isStacked },
           className
         )}
-        style={{ transform: `rotate(${rotate}deg)` }}
         {...props}
-      >
+        >
         <div className="relative w-full overflow-hidden">
           <img
             src={src}
             alt={alt}
             className={cn(
-              "w-full object-cover",
+              "w-full object-cover opacity-100 transition-opacity",
               aspectRatioClasses[aspectRatio],
-              imageClassName
+              imageClassName,
+              {
+                "opacity-0": hasSelection && !isSelected,
+                "opacity-100": hasSelection && isSelected
+              }
             )}
           />
         </div>
@@ -86,7 +118,8 @@ const Polaroid = React.forwardRef<HTMLDivElement, PolaroidProps>(
             {caption}
           </div>
         )}
-      </Card>
+        </Card>
+      </div>
     )
   }
 )
