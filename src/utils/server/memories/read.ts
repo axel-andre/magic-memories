@@ -4,8 +4,9 @@ import { memoryLane } from "~/db/memory-lane-schema";
 import { auth } from "../auth";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { paginationSchema, memoryLaneIdSchema } from "./schemas";
+import { z } from "zod";
 
 export const getUserMemoriesFn = createServerFn({ method: "GET" }).handler(
   async () => {
@@ -74,5 +75,32 @@ export const getMemoryByIdFn = createServerFn({ method: "GET" })
       memoryL.memories = convertMemoryImagesToUrls(memoryL.memories);
     }
     return memoryL;
+  });
+
+export const getUserMemoriesFnPaginated = createServerFn({
+  method: "GET",
+})
+  .inputValidator(paginationSchema.extend({ userId: z.string() }))
+  .handler(async ({ data }) => {
+    const { page, limit, userId } = data;
+    const offset = (page - 1) * limit;
+    const memoryLanes = await db.query.memoryLane.findMany({
+      with: {
+        user: true,
+        memories: true,
+      },
+      where: and(
+        eq(memoryLane.userId, userId),
+        eq(memoryLane.status, "published")
+      ),
+      limit,
+      offset,
+    });
+    memoryLanes.map((memoryLane) => {
+      if (memoryLane.memories) {
+        memoryLane.memories = convertMemoryImagesToUrls(memoryLane.memories);
+      }
+    });
+    return memoryLanes;
   });
 

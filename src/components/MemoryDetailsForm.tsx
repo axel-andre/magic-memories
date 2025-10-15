@@ -1,4 +1,4 @@
-import { useCallback, useId, useState } from "react";
+import { useId } from "react";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
@@ -20,6 +20,7 @@ export type MemoryDetailsFormProps = {
     id: string;
     values: MemoryDetailsFormValues;
     onChange: (values: MemoryDetailsFormValues) => void;
+    onDelete: () => void;
     onSubmit?: () => void;
     submitLabel?: string;
     isSubmitting?: boolean;
@@ -29,6 +30,7 @@ export function MemoryDetailsForm({
     memoryLaneId,
     id,
     values,
+    onDelete,
     onSubmit,
     submitLabel = "Save",
     isSubmitting,
@@ -119,6 +121,15 @@ export function MemoryDetailsForm({
                             <div className="flex justify-end">
                                 <Button
                                     type="button"
+                                    variant="destructive"
+                                    onClick={() => onDelete()}
+                                    className="mr-2"
+                                    disabled={isSubmitting}
+                                >
+                                    Delete
+                                </Button>
+                                <Button
+                                    type="submit"
                                     onClick={() => form.handleSubmit()}
                                     disabled={isSubmitting}
                                 >

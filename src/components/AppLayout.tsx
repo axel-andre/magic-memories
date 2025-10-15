@@ -40,7 +40,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="sticky top-4 z-50 w-fit mx-auto rounded-md backdrop-blur bg-white^">
+            <header className="sticky top-4 z-50 w-fit mx-auto rounded-md backdrop-blur bg-white">
                 <div className="container flex h-16 items-center justify-between px-4">
                     <div className="flex items-center gap-6 mr-4">
                         <nav className="hidden md:flex items-center gap-4">
@@ -120,10 +120,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 </div>
             </header>
 
-            {/* Main Content */}
             <main className="container mx-auto px-4 py-6">{children}</main>
-
-            {/* Create Memory Modal */}
             <CreateMemoryModal
                 open={isCreateModalOpen}
                 onOpenChange={setIsCreateModalOpen}

@@ -98,7 +98,7 @@ const Polaroid = React.forwardRef<HTMLDivElement, PolaroidProps>(
             src={src}
             alt={alt}
             className={cn(
-              "w-full object-cover opacity-100 transition-opacity",
+              "w-full object-cover opacity-100 transition-opacity delay-300 duration-700",
               aspectRatioClasses[aspectRatio],
               imageClassName,
               {

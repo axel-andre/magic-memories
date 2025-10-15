@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UsersIdIndexRouteImport } from './routes/users/$id/index'
 import { Route as MemoryLanesIdIndexRouteImport } from './routes/memory-lanes/$id/index'
 import { Route as MemoryLanesIdEditRouteImport } from './routes/memory-lanes/$id/edit'
 import { Route as ApiFilesSplatRouteImport } from './routes/api/files/$'
@@ -30,6 +31,11 @@ const SignInRoute = SignInRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsersIdIndexRoute = UsersIdIndexRouteImport.update({
+  id: '/users/$id/',
+  path: '/users/$id/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MemoryLanesIdIndexRoute = MemoryLanesIdIndexRouteImport.update({
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/api/files/$': typeof ApiFilesSplatRoute
   '/memory-lanes/$id/edit': typeof MemoryLanesIdEditRoute
   '/memory-lanes/$id': typeof MemoryLanesIdIndexRoute
+  '/users/$id': typeof UsersIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/api/files/$': typeof ApiFilesSplatRoute
   '/memory-lanes/$id/edit': typeof MemoryLanesIdEditRoute
   '/memory-lanes/$id': typeof MemoryLanesIdIndexRoute
+  '/users/$id': typeof UsersIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/api/files/$': typeof ApiFilesSplatRoute
   '/memory-lanes/$id/edit': typeof MemoryLanesIdEditRoute
   '/memory-lanes/$id/': typeof MemoryLanesIdIndexRoute
+  '/users/$id/': typeof UsersIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/api/files/$'
     | '/memory-lanes/$id/edit'
     | '/memory-lanes/$id'
+    | '/users/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/api/files/$'
     | '/memory-lanes/$id/edit'
     | '/memory-lanes/$id'
+    | '/users/$id'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/api/files/$'
     | '/memory-lanes/$id/edit'
     | '/memory-lanes/$id/'
+    | '/users/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   ApiFilesSplatRoute: typeof ApiFilesSplatRoute
   MemoryLanesIdEditRoute: typeof MemoryLanesIdEditRoute
   MemoryLanesIdIndexRoute: typeof MemoryLanesIdIndexRoute
+  UsersIdIndexRoute: typeof UsersIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/users/$id/': {
+      id: '/users/$id/'
+      path: '/users/$id'
+      fullPath: '/users/$id'
+      preLoaderRoute: typeof UsersIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/memory-lanes/$id/': {
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiFilesSplatRoute: ApiFilesSplatRoute,
   MemoryLanesIdEditRoute: MemoryLanesIdEditRoute,
   MemoryLanesIdIndexRoute: MemoryLanesIdIndexRoute,
+  UsersIdIndexRoute: UsersIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

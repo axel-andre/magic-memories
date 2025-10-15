@@ -1,5 +1,9 @@
 import { queryOptions, infiniteQueryOptions } from "@tanstack/react-query";
-import { getAllMemoriesFnPaginated, getMemoryByIdFn } from "./read";
+import {
+  getAllMemoriesFnPaginated,
+  getMemoryByIdFn,
+  getUserMemoriesFnPaginated,
+} from "./read";
 
 export const getAllMemoriesQueryOptions = (page: number, limit: number) => {
   return queryOptions({
@@ -27,6 +31,48 @@ export const getAllMemoriesInfiniteQueryOptions = (limit: number) => {
     queryFn: ({ pageParam }) =>
       getAllMemoriesFnPaginated({
         data: {
+          page: pageParam,
+          limit,
+        },
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      if (lastPage.length < limit) {
+        return undefined;
+      }
+      return lastPageParam + 1;
+    },
+  });
+};
+
+export const getUserMemoriesQueryOptions = (
+  userId: string,
+  page: number,
+  limit: number
+) => {
+  return queryOptions({
+    queryKey: ["memories", "user", userId, page, limit],
+    queryFn: () =>
+      getUserMemoriesFnPaginated({
+        data: {
+          userId,
+          page,
+          limit,
+        },
+      }),
+  });
+};
+
+export const getUserMemoriesInfiniteQueryOptions = (
+  userId: string,
+  limit: number
+) => {
+  return infiniteQueryOptions({
+    queryKey: ["memories", "user", "infinite", userId, limit],
+    queryFn: ({ pageParam }) =>
+      getUserMemoriesFnPaginated({
+        data: {
+          userId,
           page: pageParam,
           limit,
         },
