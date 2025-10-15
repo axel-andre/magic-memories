@@ -34,13 +34,15 @@ export const useMemoryForm = ({
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  const initialValues = {
+    title: "",
+    content: "",
+    date: new Date().toISOString().split("T")[0],
+    image: null as File | null,
+  };
+
   const form = useForm({
-    defaultValues: {
-      title: "",
-      content: "",
-      date: new Date().toISOString().split("T")[0],
-      image: null as File | null,
-    },
+    defaultValues: initialValues,
   });
 
   const handleImageDrop = useCallback(
@@ -67,6 +69,24 @@ export const useMemoryForm = ({
     setImagePreview(null);
     form.setFieldValue("image", null);
   }, [imagePreview, form]);
+
+  const resetForm = useCallback(() => {
+    // Reset form values
+    form.setFieldValue("title", initialValues.title);
+    form.setFieldValue("content", initialValues.content);
+    form.setFieldValue("date", initialValues.date);
+    form.setFieldValue("image", initialValues.image);
+
+    // Reset image-related state
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setUploadedImages([]);
+    setImagePreview(null);
+
+    // Clear any errors
+    setError(null);
+  }, [form, imagePreview]);
 
   const handleSubmit = useCallback(
     async (values: MemoryFormValues) => {
@@ -102,10 +122,8 @@ export const useMemoryForm = ({
           getMemoryByIdQueryOptions(memoryLaneId)
         );
 
-        // Clean up image preview
-        if (imagePreview) {
-          URL.revokeObjectURL(imagePreview);
-        }
+        // Reset form after successful submission
+        resetForm();
 
         onSuccess?.();
         navigate({ to: "/memory-lanes/$id", params: { id: memoryLaneId } });
@@ -140,5 +158,6 @@ export const useMemoryForm = ({
     handleRemoveImage,
     handleSubmit,
     handleCancel,
+    resetForm,
   };
 };

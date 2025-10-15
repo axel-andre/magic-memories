@@ -72,11 +72,11 @@ export const PolaroidWithIntersection = React.forwardRef<
         );
 
         return (
-            <Polaroid
-                ref={combinedRef}
-                className={className}
-                {...polaroidProps}
-            />
+          <Polaroid.Root
+            ref={combinedRef}
+            className={className}
+            {...polaroidProps}
+          />
         );
     }
 );

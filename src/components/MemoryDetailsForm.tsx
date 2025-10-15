@@ -7,7 +7,7 @@ import { Button } from "~/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { updateMemoryFn } from "~/utils/server/memories/update";
 import { getMemoryByIdQueryOptions } from "~/utils/server/memories";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export type MemoryDetailsFormValues = {
     title: string;
@@ -39,17 +39,23 @@ export function MemoryDetailsForm({
     const titleId = useId();
     const dateId = useId();
     const contentId = useId();
+    const updateMemoryMutation = useMutation({
+        mutationFn: updateMemoryFn,
+        onSuccess: () => {
+            queryClient.invalidateQueries(getMemoryByIdQueryOptions(memoryLaneId));
+        },
+    })
     const form = useForm({
         defaultValues: {
             title: values.title,
             date: new Date(values.date ?? new Date()).toISOString().split('T')[0],
             content: values.content,
         },
-        onSubmit: async ({ value }) => {
+        onSubmit: async ({ value, formApi }) => {
             if (!id) {
                 throw new Error("Id is required");
             }
-            await updateMemoryFn({
+            await updateMemoryMutation.mutateAsync({
                 data: {
                     id,
                     title: value.title,
@@ -57,9 +63,6 @@ export function MemoryDetailsForm({
                     content: value.content,
                 },
             })
-            const queryOptions = getMemoryByIdQueryOptions(memoryLaneId);
-            console.log("queryOptions", queryOptions);
-            await queryClient.invalidateQueries(queryOptions);
         },
     })
     return (
@@ -129,8 +132,8 @@ export function MemoryDetailsForm({
                                     Delete
                                 </Button>
                                 <Button
-                                    type="submit"
-                                    onClick={() => form.handleSubmit()}
+                                    type="button"
+                                    onClick={form.handleSubmit}
                                     disabled={isSubmitting}
                                 >
                                     {submitLabel}

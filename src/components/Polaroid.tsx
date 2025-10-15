@@ -44,10 +44,10 @@ export interface PolaroidProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Whether the polaroid is selected
    */
+  footer?: React.ReactNode
   isSelected?: boolean
 }
-
-const Polaroid = React.forwardRef<HTMLDivElement, PolaroidProps>(
+const Root = React.forwardRef<HTMLDivElement, PolaroidProps>(
   (
     {
       src,
@@ -59,8 +59,9 @@ const Polaroid = React.forwardRef<HTMLDivElement, PolaroidProps>(
       captionClassName,
       className,
       hasSelection = false,
-      isSelected = false,
       isStacked = false,
+      footer,
+      isSelected = false,
       ...props
     },
     ref
@@ -108,23 +109,31 @@ const Polaroid = React.forwardRef<HTMLDivElement, PolaroidProps>(
             )}
           />
         </div>
-        {caption && (
-          <div
-            className={cn(
-              "mt-4 text-center font-handwriting text-sm text-gray-700",
-              captionClassName
-            )}
-          >
-            {caption}
-          </div>
-        )}
+          {footer}
         </Card>
       </div>
     )
   }
 )
-
-Polaroid.displayName = "Polaroid"
-
-export { Polaroid }
+export const SubCaption = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("mt-4 text-center font-handwriting text-sm text-gray-700", className)}
+    {...props}
+  />
+))
+export const Caption = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("mt-4 text-center font-handwriting text-sm text-gray-700 font-bold", className)}
+    {...props}
+  />
+))
+SubCaption.displayName = "SubCaption"
+Caption.displayName = "Caption"
+export const Polaroid = {
+  Root,
+  SubCaption,
+  Caption,
+}
 

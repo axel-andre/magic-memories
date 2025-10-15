@@ -1,7 +1,8 @@
+"server-only";
 import { createMiddleware } from "@tanstack/react-start";
 import { getUserBySessionFn } from "./read";
 
-export const requireAuthed = createMiddleware({ type: "request" }).server(
+export const requireAuthed = createMiddleware({ type: "function" }).server(
   async (ctx) => {
     const user = await getUserBySessionFn();
     if (!user) {

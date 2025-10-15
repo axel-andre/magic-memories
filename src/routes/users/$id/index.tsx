@@ -16,9 +16,13 @@ export const Route = createFileRoute('/users/$id/')({
   },
 })
 
-function UserProfile() {
+export function UserProfile() {
   const { id } = Route.useParams();
-  const { data: user, isLoading: userLoading, error: userError } = useQuery(getUserByIdPublicQueryOptions(id));
+  const {
+    data: user,
+    isLoading: userLoading,
+    error: userError,
+  } = useQuery(getUserByIdPublicQueryOptions(id));
 
   if (userLoading) {
     return (
@@ -41,7 +45,9 @@ function UserProfile() {
       <div className="max-w-4xl mx-auto space-y-6 pt-12">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">User Not Found</h1>
-          <p className="text-muted-foreground">The user you're looking for doesn't exist or has been removed.</p>
+          <p className="text-muted-foreground">
+            The user you're looking for doesn't exist or has been removed.
+          </p>
         </div>
       </div>
     );
@@ -54,7 +60,7 @@ function UserProfile() {
           <Avatar className="h-20 w-20">
             <AvatarImage src={user.image || undefined} alt={user.name} />
             <AvatarFallback className="text-2xl">
-              {user.name?.charAt(0).toUpperCase() || 'U'}
+              {user.name?.charAt(0).toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>
           <div className="space-y-1">

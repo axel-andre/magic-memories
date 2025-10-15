@@ -1,6 +1,11 @@
 import React, { useCallback, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 import { authClient } from "~/utils/auth";
 import { getMemoryByIdQueryOptions } from "~/utils/server/memories";
 import z from "zod";
@@ -11,28 +16,37 @@ import { MemoryGallery } from "~/components/MemoryGallery";
 import { MemoryDetailsPanel } from "~/components/MemoryDetailsPanel";
 import { useMemoryLaneState } from "~/hooks/useMemoryLaneState";
 import { MemoryDetailsFormValues } from "~/components/MemoryDetailsForm";
-// import { deleteMemoryFn } from "~/utils/server/memories/delete";
+import { deleteMemoryFn } from "~/utils/server/memories/delete";
+import { usePublicationState } from "~/hooks/usePublicationState";
 
 export const Route = createFileRoute("/memory-lanes/$id/")({
   component: RouteComponent,
   beforeLoad: async ({ context, params, search }) => {
     const { id } = params;
     const { editing } = search;
-    const data = await context.queryClient.ensureQueryData(getMemoryByIdQueryOptions(id));
+    const data = await context.queryClient.ensureQueryData(
+      getMemoryByIdQueryOptions(id)
+    );
     if (editing && data?.user?.id !== context.user?.id) {
-      throw redirect({ to: "/memory-lanes/$id", params: { id }, search: { editing: false } })
+      throw redirect({
+        to: "/memory-lanes/$id",
+        params: { id },
+        search: { editing: false },
+      });
     }
   },
   loader: async ({ context, params, location }) => {
     const { id } = params;
-    const memoryLane = await context.queryClient.ensureQueryData(getMemoryByIdQueryOptions(id));
+    const memoryLane = await context.queryClient.ensureQueryData(
+      getMemoryByIdQueryOptions(id)
+    );
     return { memoryLane };
   },
   ssr: true,
   errorComponent: (error) => <div>Error: {JSON.stringify(error)}</div>,
   validateSearch: z.object({
     editing: z.boolean().optional().default(false),
-  })
+  }),
 });
 
 function RouteComponent() {
@@ -41,6 +55,13 @@ function RouteComponent() {
   const navigate = useNavigate();
   const { data: sessionData, isPending } = authClient.useSession();
   const { data } = useQuery(getMemoryByIdQueryOptions(id));
+  const queryClient = useQueryClient();
+  const { mutate: deleteMemory } = useMutation({
+    mutationFn: deleteMemoryFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries(getMemoryByIdQueryOptions(id));
+    },
+  });
 
   const {
     revealedMemories,
@@ -52,28 +73,68 @@ function RouteComponent() {
     closeAddMemoryDialog,
   } = useMemoryLaneState();
 
+  const {
+    isLoading: isStatusChanging,
+    changeStatus,
+    updateMemoryLane,
+  } = usePublicationState({
+    memoryLaneId: id,
+    currentStatus: data?.status || "draft",
+    onSuccess: (newStatus) => {
+      console.log(`Memory lane status changed to: ${newStatus}`);
+    },
+    onError: (error) => {
+      console.error("Status change error:", error);
+    },
+  });
+
   // Memoized computed values
-  const hasMemories = useMemo(() => (data?.memories?.length ?? 0) > 0, [data?.memories?.length]);
-  const isOwner = useMemo(() => sessionData?.user?.id === data?.user?.id, [sessionData?.user?.id, data?.user?.id]);
-  const currentMemory = useMemo(() => data?.memories?.[selectedMemory], [data?.memories, selectedMemory]);
+  const hasMemories = useMemo(
+    () => (data?.memories?.length ?? 0) > 0,
+    [data?.memories?.length]
+  );
+  const isOwner = useMemo(
+    () => sessionData?.user?.id === data?.user?.id,
+    [sessionData?.user?.id, data?.user?.id]
+  );
+  const currentMemory = useMemo(
+    () => data?.memories?.[selectedMemory],
+    [data?.memories, selectedMemory]
+  );
 
   // Event handlers
   const handleEdit = useCallback(() => {
     // Navigate to edit mode
-    navigate({ to: "/memory-lanes/$id", params: { id }, search: { editing: true } });
+    navigate({
+      to: "/memory-lanes/$id",
+      params: { id },
+      search: { editing: true },
+    });
   }, [id, navigate]);
 
   const handleCancel = useCallback(() => {
     // Navigate back to view mode
-    navigate({ to: "/memory-lanes/$id", params: { id }, search: { editing: false } });
+    navigate({
+      to: "/memory-lanes/$id",
+      params: { id },
+      search: { editing: false },
+    });
   }, [id, navigate]);
 
-  const handleSave = useCallback((title: string) => {
-  // TODO: Implement memory lane title update
-    console.log("Updating memory lane title:", title);
-    // For now, just redirect back to non-editing mode
-    handleCancel();
-  }, [handleCancel]);
+  const handleSave = useCallback(
+    (title: string) => {
+      updateMemoryLane({ name: title });
+      handleCancel();
+    },
+    [updateMemoryLane, handleCancel]
+  );
+
+  const handleStatusChange = useCallback(
+    (status: "draft" | "published" | "archived") => {
+      changeStatus(status);
+    },
+    [changeStatus]
+  );
 
   const handleDelete = useCallback(() => {
     // TODO: Implement memory lane deletion
@@ -104,32 +165,38 @@ function RouteComponent() {
         onSave={handleSave}
         onAddMemory={openAddMemoryDialog}
         onDelete={handleDelete}
+        onStatusChange={handleStatusChange}
+        isStatusChanging={isStatusChanging}
       />
 
       {!hasMemories ? (
-        <MemoryDetailsEmptyState id={id} />
+        <MemoryDetailsEmptyState id={id} onAddMemory={openAddMemoryDialog} />
       ) : (
         <div className="flex gap-20 justify-center w-full">
-            <MemoryGallery
-              memories={data.memories || []}
-              revealedMemories={revealedMemories}
-              isOwner={isOwner}
-              onMemoryVisible={handleMemoryVisible}
-              onMemoryClick={handleMemoryClick}
-              onAddMemory={openAddMemoryDialog}
-            />
+          <MemoryGallery
+            memories={data.memories || []}
+            revealedMemories={revealedMemories}
+            isOwner={isOwner}
+            onMemoryVisible={handleMemoryVisible}
+            onMemoryClick={handleMemoryClick}
+            onAddMemory={openAddMemoryDialog}
+          />
 
-            {!isPending && hasMemories && currentMemory && (
-              <MemoryDetailsPanel
-                memory={currentMemory}
-                memoryLaneId={id}
-                isEditing={editing}
-                isPending={isPending}
-                onMemoryChange={handleMemoryChange}
-                onMemorySubmit={handleMemorySubmit}
-                onMemoryDelete={() => { }}
-              />
-            )}
+          {!isPending && hasMemories && currentMemory && (
+            <MemoryDetailsPanel
+              memory={currentMemory}
+              memoryLaneId={id}
+              isEditing={editing}
+              isPending={isPending}
+              onMemoryChange={handleMemoryChange}
+              onMemorySubmit={handleMemorySubmit}
+              onMemoryDelete={() => {
+                deleteMemory({
+                  data: { memoryId: currentMemory.id, memoryLaneId: id },
+                });
+              }}
+            />
+          )}
         </div>
       )}
 

@@ -1,33 +1,22 @@
 "server-only";
 import { createMiddleware } from "@tanstack/react-start";
-import { getUserBySessionFn } from "../users/read";
 import z from "zod";
-import { eq } from "drizzle-orm";
-import { db } from "../db.node";
-import { memoryLane } from "~/db/memory-lane-schema";
-import { notFound } from "@tanstack/react-router";
+import { requireAuthed } from "../users/middlewares";
 
 export const assertMemoryLaneOwner = createMiddleware({
   type: "function",
 })
+  .middleware([requireAuthed])
   .inputValidator(
-    z.object({
+    z.looseObject({
       memoryLaneId: z.string(),
     })
   )
-  .server(async ({ data, next }) => {
-    const user = await getUserBySessionFn();
-    if (!user) {
-      throw new Error("Unauthorized");
-    }
-    const ml = await db.query.memoryLane.findFirst({
-      where: eq(memoryLane.id, data.memoryLaneId),
+  .server(async ({ next, context }) => {
+    return await next({
+      context: {
+        ...context,
+        user: context.user,
+      },
     });
-    if (!ml) {
-      throw notFound();
-    }
-    if (ml.userId !== user.id) {
-      throw new Error("Unauthorized");
-    }
-    return next();
   });

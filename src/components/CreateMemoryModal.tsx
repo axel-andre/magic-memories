@@ -44,7 +44,11 @@ export function CreateMemoryModal({ open, onOpenChange }: CreateMemoryModalProps
                 form.reset()
 
                 // Optionally navigate or refresh data
-                navigate({ to: '/memory-lanes/$id/edit', params: { id: newMemory.id } })
+                navigate({
+                  to: "/memory-lanes/$id",
+                  params: { id: newMemory.id },
+                  search: { editing: true },
+                });
             } catch (err: any) {
                 console.error('Error creating memory:', err)
                 setError(err.message || 'Failed to create memory. Please try again.')

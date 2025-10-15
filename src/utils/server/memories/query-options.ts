@@ -86,3 +86,37 @@ export const getUserMemoriesInfiniteQueryOptions = (
     },
   });
 };
+
+// Published memory lanes query options (uses default published status)
+export const getPublishedMemoryLanesQueryOptions = (page: number, limit: number) => {
+  return queryOptions({
+    queryKey: ["memory-lanes", "published", page, limit],
+    queryFn: () =>
+      getAllMemoriesFnPaginated({
+        data: {
+          page,
+          limit,
+        },
+      }),
+  });
+};
+
+export const getPublishedMemoryLanesInfiniteQueryOptions = (limit: number) => {
+  return infiniteQueryOptions({
+    queryKey: ["memory-lanes", "published", "infinite", limit],
+    queryFn: ({ pageParam }) =>
+      getAllMemoriesFnPaginated({
+        data: {
+          page: pageParam,
+          limit,
+        },
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      if (lastPage.length < limit) {
+        return undefined;
+      }
+      return lastPageParam + 1;
+    },
+  });
+};

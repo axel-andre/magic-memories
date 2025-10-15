@@ -2,6 +2,7 @@ import React, { memo, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { PolaroidWithIntersection } from '~/components/PolaroidWithIntersection';
+import { Polaroid } from "./Polaroid";
 
 interface Memory {
   id: string;
@@ -52,6 +53,11 @@ export const MemoryGallery = memo<MemoryGalleryProps>(({
           rotate={index % 2 === 0 ? 10 : 20}
           visibilityThreshold={0.8}
           triggerOnce={false}
+          footer={
+            <>
+              <Polaroid.Caption>{memory.title}</Polaroid.Caption>
+            </>
+          }
           onVisible={() => handleMemoryVisible(index)}
           onClick={(e) => handleMemoryClick(index, e)}
         />
