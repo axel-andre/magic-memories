@@ -4,34 +4,15 @@ A social memory-sharing platform where users create and publish collections of m
 
 ## Features
 
-### User Authentication
-- **Secure Authentication**: Email/password authentication powered by Better Auth
-- **User Profiles**: Create and manage your personal profile
-- **Session Management**: Persistent login with secure cookie handling
-
-### Memory Management
-- **Create Memory Lanes**: Organize your memories into themed collections
-- **Rich Memory Details**: Add photos, titles, descriptions, and dates to each memory
-- **Image Upload**: Upload and store images using Cloudflare R2 with retry logic
-- **Polaroid Gallery**: Beautiful polaroid-style image display with animations and rotation effects
-
-### Publication System
-- **Draft Management**: Create and edit memory lanes before publishing
-- **Publication Control**: Publish your memory lanes to make them publicly visible
-- **Status Management**: Track memory lanes as draft, published, or archived
-- **Owner Controls**: Full CRUD operations for your own memory lanes
-
-### Social Features
-- **Public Feed**: Discover and explore published memory lanes from all users
-- **User Profiles**: View all published memory lanes by specific users
-- **Infinite Scroll**: Seamlessly browse through memory lanes with automatic loading
-- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-
-### User Experience
+- **Create & Share Memory Collections**: Organize photos and stories into themed "Memory Lanes"
+- **Beautiful Polaroid Gallery**: Display memories in an elegant polaroid-style layout with animations
+- **User Authentication**: Secure sign-up and login with persistent sessions
+- **Draft & Publish**: Create private drafts, then publish to share with the world
+- **Public Discovery**: Browse and explore memory lanes from all users
+- **User Profiles**: View all published memories from specific users
+- **Image Upload**: Store photos securely with Cloudflare R2
+- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
 - **Modern UI**: Built with Tailwind CSS and shadcn/ui components
-- **Smooth Animations**: Intersection observer-based animations for memory reveals
-- **Loading States**: Comprehensive loading and error states throughout the app
-- **Accessibility**: Built with accessibility best practices using Radix UI primitives
 
 ## Tech Stack
 
