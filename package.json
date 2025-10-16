@@ -1,11 +1,12 @@
 {
-  "name": "tanstack-start-example-basic-cloudflare",
+  "name": "magic-memories",
   "private": true,
   "sideEffects": false,
   "type": "module",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && tsc --noEmit",
+    "build:prod": "CLOUDFLARE_ENV=production pnpm build",
     "preview": "vite preview",
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
@@ -15,6 +16,7 @@
     "db:generate": "drizzle-kit generate",
     "auth:generate": "npx @better-auth/cli generate --config ./auth.generate.ts",
     "db:apply:local": "npx wrangler d1 migrations apply db_app --local",
+    "db:apply:prod": "npx wrangler d1 migrations apply db_app --remote",
     "db:setup:local": "npm run db:generate && npm run db:apply:local",
     "dev:cf": "npx wrangler dev"
   },

@@ -25,13 +25,13 @@ export function NotFound({ children }: { children?: any }) {
                 </div>
               </div>
             </div>
-            <CardTitle className="text-2xl">Memory Not Found</CardTitle>
+            <CardTitle className="text-2xl">Magic Memory Not Found</CardTitle>
             <CardDescription className="text-base">
               {children || (
                 <>
-                  This memory lane doesn't exist or has been moved.
+                  This magical memory doesn't exist or has been moved.
                   <br />
-                  Let's find your way back to your memories.
+                  Let's find your way back to your magical memories.
                 </>
               )}
             </CardDescription>
@@ -49,14 +49,14 @@ export function NotFound({ children }: { children?: any }) {
               <Button asChild variant="default">
                 <Link to="/" className="flex items-center gap-2">
                   <Home className="h-4 w-4" />
-                  Memory Lanes
+                  Magic Memories
                 </Link>
               </Button>
             </div>
             <div className="text-sm text-muted-foreground pt-2">
               <p>
-                Lost? Browse all available memory lanes or create a new one to
-                get started.
+                Lost? Browse all available magical memories or create a new one
+                to get started.
               </p>
             </div>
           </CardContent>

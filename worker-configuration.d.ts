@@ -3,7 +3,7 @@
 // Runtime types generated with workerd@1.20251008.0 2025-09-24 nodejs_compat
 declare namespace Cloudflare {
 	interface Env {
-		BETTER_AUTH_URL: "https://tanstack-start-app-production.98-axel-andre-482.workers.dev" | "http://localhost:3000";
+		BETTER_AUTH_URL: "https://magic-memories-app-production.98-axel-andre-482.workers.dev" | "http://localhost:3000";
 		CLOUDFLARE_ACCOUNT_ID: string;
 		CLOUDFLARE_DATABASE_ID: string;
 		CLOUDFLARE_D1_TOKEN: string;

@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "tanstack-start-app",
+	"name": "magic-memories-app",
 	"compatibility_date": "2025-09-24",
 	"compatibility_flags": [
 		"nodejs_compat"
@@ -12,7 +12,7 @@
 				"enabled": true,
 			},
 			"vars": {
-				"BETTER_AUTH_URL": "https://tanstack-start-app-production.98-axel-andre-482.workers.dev",
+				"BETTER_AUTH_URL": "https://magic-memories-app-production.98-axel-andre-482.workers.dev",
 			},
 			"d1_databases": [
 				{
@@ -22,6 +22,12 @@
 					"preview_database_id": "local-test-db",
 				}
 			],
+			"r2_buckets": [
+				{
+					"binding": "IMAGE_BUCKET",
+					"bucket_name": "image-ml",
+				}
+			]
 		},
 		"development": {
 			"vars": {
@@ -45,9 +51,7 @@
 			"preview_database_id": "local-test-db",
 		}
 	],
-	"images": {
-		"binding": "IMAGES",
-	},
+
 	"r2_buckets": [
 		{
 			"binding": "IMAGE_BUCKET",

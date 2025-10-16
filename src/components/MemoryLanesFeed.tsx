@@ -104,10 +104,14 @@ export const MemoryLanesFeed = () => {
           className="h-10 flex items-center justify-center"
         >
           {isFetchingNextPage && (
-            <p className="text-muted-foreground">Loading more memories...</p>
+            <p className="text-muted-foreground">
+              Loading more magical memories...
+            </p>
           )}
           {!hasNextPage && memories.length > 0 && (
-            <p className="text-muted-foreground">No more memories ...</p>
+            <p className="text-muted-foreground">
+              No more magical memories ...
+            </p>
           )}
         </div>
       </div>

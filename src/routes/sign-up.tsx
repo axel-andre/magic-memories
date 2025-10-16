@@ -62,9 +62,12 @@ function SignUp() {
     <div className="min-h-screen flex justify-center p-4">
       <Card className="w-full max-w-md bg-white h-fit mt-10">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            Join Magic Memories
+          </CardTitle>
           <CardDescription>
-            Enter your information to create a new account
+            Create your account to start sharing your magical memories with the
+            world
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -130,10 +133,10 @@ function SignUp() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Creating account...' : 'Sign Up'}
+              {isLoading ? "Creating account..." : "Sign Up"}
             </Button>
             <div className="text-sm text-center text-muted-foreground">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link to="/sign-in" className="text-primary hover:underline">
                 Sign in
               </Link>
@@ -142,6 +145,6 @@ function SignUp() {
         </form>
       </Card>
     </div>
-  )
+  );
 }
 

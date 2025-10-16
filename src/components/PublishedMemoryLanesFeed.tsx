@@ -61,7 +61,7 @@ export const PublishedMemoryLanesFeed = memo<PublishedMemoryLanesFeedProps>(
       return (
         <div className={`text-center py-12 ${className}`}>
           <div className="text-destructive mb-2">
-            Failed to load memory lanes
+            Failed to load magical memories
           </div>
           <p className="text-muted-foreground text-sm">
             {error instanceof Error ? error.message : "Something went wrong"}
@@ -74,10 +74,10 @@ export const PublishedMemoryLanesFeed = memo<PublishedMemoryLanesFeedProps>(
       return (
         <div className={`text-center py-12 ${className}`}>
           <div className="text-muted-foreground mb-2">
-            No published memory lanes found
+            No published magical memories found
           </div>
           <p className="text-sm text-muted-foreground">
-            Check back later for new memory lanes to explore!
+            Check back later for new magical memories to explore!
           </p>
         </div>
       );

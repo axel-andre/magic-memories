@@ -1,15 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import {
-  Compass,
-  Heart,
-  LogIn,
-  LogOut,
-  Plus,
-  Settings,
-  Share,
-  User,
-} from "lucide-react";
+import { Compass, Heart, LogIn, LogOut, Plus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
@@ -73,7 +64,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                       params={{ id: session.data?.user?.id }}
                     >
                       <Heart className="h-4 w-4" />
-                      My Memory Lanes
+                      My Magic Memories
                     </Link>
                   </Button>
                 ) : null}
@@ -91,7 +82,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 }}
               >
                 <Plus className="h-4 w-4" />
-                Share my memories
+                Create Magic Memory
               </Button>
             </div>
             <div className="flex items-center gap-4 ml-4">
