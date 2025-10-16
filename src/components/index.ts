@@ -13,7 +13,6 @@ export { Polaroid } from "./Polaroid";
 export { PolaroidWithIntersection } from "./PolaroidWithIntersection";
 export { PublicationControls } from "./PublicationControls";
 export { PublishedMemoryLanesFeed } from "./PublishedMemoryLanesFeed";
-export { MemoryLaneEditDialog } from "./MemoryLaneEditDialog";
 export { AppLayout } from "./AppLayout";
 export { DefaultCatchBoundary } from "./DefaultCatchBoundary";
 export { NotFound } from "./NotFound";
