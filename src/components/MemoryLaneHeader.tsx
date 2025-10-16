@@ -5,7 +5,6 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { PublicationControls } from "./PublicationControls";
-import { MemoryLaneEditDialog } from "./MemoryLaneEditDialog";
 
 interface MemoryLaneHeaderProps {
   memoryLane: {
@@ -33,11 +32,8 @@ export const MemoryLaneHeader = memo<MemoryLaneHeaderProps>(
     memoryLane,
     isEditing,
     isOwner,
-    onEdit,
-    onCancel,
     onSave,
     onAddMemory,
-    onDelete,
     onStatusChange,
     isStatusChanging = false,
   }) => {
@@ -71,13 +67,15 @@ export const MemoryLaneHeader = memo<MemoryLaneHeaderProps>(
                   <h1 className="text-3xl font-bold tracking-tight">
                     {memoryLane.name}
                   </h1>
-                  <PublicationControls
-                    currentStatus={memoryLane.status}
-                    isOwner={isOwner}
-                    onStatusChange={onStatusChange}
-                    onEdit={handleEditDetails}
-                    isLoading={isStatusChanging}
-                  />
+                  {isOwner && (
+                    <PublicationControls
+                      currentStatus={memoryLane.status}
+                      isOwner={isOwner}
+                      onStatusChange={onStatusChange}
+                      onEdit={handleEditDetails}
+                      isLoading={isStatusChanging}
+                    />
+                  )}
                 </div>
                 {memoryLane.user?.id && (
                   <Link
