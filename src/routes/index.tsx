@@ -1,16 +1,15 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { useInfiniteQuery } from '@tanstack/react-query'
-import { Polaroid } from '~/components/Polaroid';
-import { getAllMemoriesInfiniteQueryOptions } from '~/utils/server/memories';
-import { useEffect, useRef } from 'react';
-import { MemoryLanesFeed } from '~/components/MemoryLanesFeed';
+import { createFileRoute } from "@tanstack/react-router";
+import { getAllMemoriesInfiniteQueryOptions } from "~/utils/server/memories";
+import { MemoryLanesFeed } from "~/components/MemoryLanesFeed";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: Home,
   loader: async ({ context }) => {
-    await context.queryClient.ensureInfiniteQueryData(getAllMemoriesInfiniteQueryOptions(1));
+    await context.queryClient.ensureInfiniteQueryData(
+      getAllMemoriesInfiniteQueryOptions(1)
+    );
   },
-})
+});
 
 function Home() {
   return (

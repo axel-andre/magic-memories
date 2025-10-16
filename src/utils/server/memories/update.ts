@@ -29,7 +29,6 @@ export const updateMemoryFn = createServerFn({ method: "POST" })
         .returning();
       return updatedMemory;
     } catch (error) {
-      console.error(error);
       throw new Error("Failed to update memory");
     }
   });

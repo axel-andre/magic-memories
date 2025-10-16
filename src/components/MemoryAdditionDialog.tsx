@@ -35,7 +35,9 @@ export const MemoryAdditionDialog = memo<MemoryAdditionDialogProps>(
     } = useMemoryForm({
       memoryLaneId: id,
       onSuccess: onClose,
-      onError: (error) => console.error("Memory creation error:", error),
+      onError: (error) => {
+        // Handle memory creation error
+      },
     });
 
     // Reset form when dialog is closed

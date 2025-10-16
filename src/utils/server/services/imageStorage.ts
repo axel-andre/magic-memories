@@ -15,7 +15,6 @@ class ImageStorage {
         customMetadata,
       });
     } catch (error) {
-      console.error("Error storing image", error);
       throw error;
     }
   }

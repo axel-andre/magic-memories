@@ -28,14 +28,10 @@ const preLogMiddleware = createMiddleware({ type: 'function' })
 export const logMiddleware = createMiddleware({ type: 'function' })
   .middleware([preLogMiddleware])
   .client(async (ctx) => {
-    const res = await ctx.next()
+    const res = await ctx.next();
 
-    const now = new Date()
-    console.log('Client Req/Res:', {
-      duration: now.getTime() - res.context.clientTime.getTime(),
-      durationToServer: res.context.durationToServer,
-      durationFromServer: now.getTime() - res.context.serverTime.getTime(),
-    })
+    const now = new Date();
+    // Log client request/response timing
 
-    return res
+    return res;
   })

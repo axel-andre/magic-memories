@@ -151,7 +151,7 @@ export const MemoryLaneHeader = memo<MemoryLaneHeaderProps>(
                   <Pencil className="h-4 w-4 mr-2" /> Edit
                 </Link>
               </Button>
-              <Button variant="destructive" size="sm">
+              <Button variant="destructive" size="sm" onClick={onDelete}>
                 <Trash className="h-4 w-4 mr-2" /> Delete
               </Button>
             </div>

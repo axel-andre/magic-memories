@@ -26,6 +26,7 @@ export const getUserMemoriesFn = createServerFn({ method: "GET" }).handler(
       with: {
         user: true,
       },
+      orderBy: [desc(memoryLane.updatedAt)],
     });
     return memories;
   }
@@ -59,6 +60,7 @@ export const getAllMemoriesFnPaginated = createServerFn({
         memories: true,
       },
       where: whereCondition,
+      orderBy: [desc(memoryLane.updatedAt)],
       limit,
       offset,
     });
@@ -96,6 +98,7 @@ export const getUserMemoriesFnPaginated = createServerFn({
   .inputValidator(paginationSchema.extend({ userId: z.string() }))
   .handler(async ({ data, context }) => {
     const { page, limit, userId } = data;
+
     const offset = (page - 1) * limit;
     const whereCondtions = [eq(memoryLane.userId, userId)];
     if (context.user?.id !== userId) {
@@ -106,6 +109,7 @@ export const getUserMemoriesFnPaginated = createServerFn({
         user: true,
         memories: true,
       },
+      orderBy: [desc(memoryLane.updatedAt)],
       where: and(...whereCondtions),
       limit,
       offset,

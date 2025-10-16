@@ -128,7 +128,6 @@ export const useMemoryForm = ({
         onSuccess?.();
         navigate({ to: "/memory-lanes/$id", params: { id: memoryLaneId } });
       } catch (err: any) {
-        console.error("Error saving memory:", err);
         const errorMsg =
           err.message || "Failed to save memory. Please try again.";
         setError(errorMsg);

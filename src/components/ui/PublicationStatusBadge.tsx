@@ -16,19 +16,19 @@ export const PublicationStatusBadge: React.FC<PublicationStatusBadgeProps> = ({
         return {
           label: "Draft",
           variant: "secondary" as const,
-          className: "bg-yellow-100 text-yellow-800 border-yellow-200",
+          className: "bg-yellow-600 text-yellow-100",
         };
       case "published":
         return {
           label: "Published",
           variant: "default" as const,
-          className: "bg-green-100 text-green-800 border-green-200",
+          className: "bg-green-600 text-green-100",
         };
       case "archived":
         return {
           label: "Archived",
           variant: "outline" as const,
-          className: "bg-gray-100 text-gray-600 border-gray-200",
+          className: "bg-gray-600 text-gray-100",
         };
       default:
         return {

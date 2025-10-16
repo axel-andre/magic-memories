@@ -101,7 +101,14 @@ export const MemoryLanesFeed = () => {
                 <>
                   <Polaroid.Caption>{memory.name}</Polaroid.Caption>
                   <Polaroid.SubCaption>
-                    By {memory.user.name}
+                    By{" "}
+                    <Link
+                      to="/users/$id"
+                      params={{ id: memory.user.id }}
+                      className="text-primary hover:text-primary/80"
+                    >
+                      {memory.user.name}
+                    </Link>
                   </Polaroid.SubCaption>
                 </>
               }

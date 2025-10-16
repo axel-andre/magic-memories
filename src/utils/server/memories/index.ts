@@ -3,3 +3,4 @@ export * from "./create";
 export * from "./read";
 export * from "./query-options";
 export * from "./memory-lane-operations";
+export * from "./delete";

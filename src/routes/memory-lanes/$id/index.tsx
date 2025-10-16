@@ -16,8 +16,12 @@ import { MemoryGallery } from "~/components/MemoryGallery";
 import { MemoryDetailsPanel } from "~/components/MemoryDetailsPanel";
 import { useMemoryLaneState } from "~/hooks/useMemoryLaneState";
 import { MemoryDetailsFormValues } from "~/components/MemoryDetailsForm";
-import { deleteMemoryFn } from "~/utils/server/memories/delete";
+import {
+  deleteMemoryFn,
+  deleteMemoryLaneFn,
+} from "~/utils/server/memories/delete";
 import { usePublicationState } from "~/hooks/usePublicationState";
+import { MemoryLaneDeletionModal } from "~/components/MemoryLaneDeletionModal";
 
 export const Route = createFileRoute("/memory-lanes/$id/")({
   component: RouteComponent,
@@ -56,6 +60,8 @@ function RouteComponent() {
   const { data: sessionData, isPending } = authClient.useSession();
   const { data } = useQuery(getMemoryByIdQueryOptions(id));
   const queryClient = useQueryClient();
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+
   const { mutate: deleteMemory } = useMutation({
     mutationFn: deleteMemoryFn,
     onSuccess: () => {
@@ -81,10 +87,10 @@ function RouteComponent() {
     memoryLaneId: id,
     currentStatus: data?.status || "draft",
     onSuccess: (newStatus) => {
-      console.log(`Memory lane status changed to: ${newStatus}`);
+      // Status changed successfully
     },
     onError: (error) => {
-      console.error("Status change error:", error);
+      // Handle status change error
     },
   });
 
@@ -137,18 +143,21 @@ function RouteComponent() {
   );
 
   const handleDelete = useCallback(() => {
-    // TODO: Implement memory lane deletion
-    console.log("Deleting memory lane:", id);
-  }, [id]);
+    setShowDeleteModal(true);
+  }, []);
+
+  const handleDeleteSuccess = useCallback(() => {
+    setShowDeleteModal(false);
+    // Navigate to home after successful deletion
+    navigate({ to: "/" });
+  }, [navigate]);
 
   const handleMemoryChange = useCallback((values: MemoryDetailsFormValues) => {
-    // TODO: Handle memory changes
-    console.log("Memory changed:", values);
+    // Handle memory changes
   }, []);
 
   const handleMemorySubmit = useCallback(() => {
-    // TODO: Handle memory submission
-    console.log("Memory submitted");
+    // Handle memory submission
   }, []);
   if (!data) {
     return <div>Loading...</div>;
@@ -200,13 +209,25 @@ function RouteComponent() {
         </div>
       )}
 
-      <MemoryAdditionDialog
-        id={id}
-        isOpen={showAddMemoryDialog}
-        onClose={closeAddMemoryDialog}
-        title={`Add memory to ${data.name || "Memory Lane"}`}
-        description="Add a new memory with photos, descriptions, and dates."
-      />
+      {isOwner && (
+        <MemoryAdditionDialog
+          id={id}
+          isOpen={showAddMemoryDialog}
+          onClose={closeAddMemoryDialog}
+          title={`Add memory to ${data.name || "Memory Lane"}`}
+          description="Add a new memory with photos, descriptions, and dates."
+        />
+      )}
+
+      {isOwner && (
+        <MemoryLaneDeletionModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          memoryLaneId={id}
+          memoryLaneName={data.name || "Memory Lane"}
+          onSuccess={handleDeleteSuccess}
+        />
+      )}
     </div>
   );
 }
