@@ -1,6 +1,6 @@
 "server-only";
 import { z } from "zod";
-import { eq, and, desc, asc } from "drizzle-orm";
+import { eq, and, desc, asc, ne } from "drizzle-orm";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 
@@ -11,6 +11,8 @@ import { auth } from "../auth";
 
 import { paginationSchema, memoryLaneIdSchema } from "./schemas";
 import { requireAuthed } from "../users/middlewares";
+import { notFound } from "@tanstack/react-router";
+import { AuthorizationError } from "~/utils/errors";
 
 export const getUserMemoriesFn = createServerFn({ method: "GET" }).handler(
   async () => {
@@ -18,11 +20,17 @@ export const getUserMemoriesFn = createServerFn({ method: "GET" }).handler(
     const session = await auth.api.getSession({ headers });
 
     if (!session?.user?.id) {
-      throw new Error("Unauthorized");
+      throw new AuthorizationError(
+        "Unauthorized",
+        "You must be logged in to get your memories"
+      );
     }
 
     const memories = await db.query.memoryLane.findMany({
-      where: eq(memoryLane.userId, session.user.id),
+      where: and(
+        eq(memoryLane.userId, session.user.id),
+        eq(memoryLane.status, "published")
+      ),
       with: {
         user: true,
       },
@@ -49,7 +57,6 @@ export const getAllMemoriesFnPaginated = createServerFn({
     const { page, limit, status } = data;
     const offset = (page - 1) * limit;
 
-    // Build where condition based on status
     const whereCondition = status
       ? eq(memoryLane.status, status)
       : eq(memoryLane.status, "published");
@@ -85,6 +92,12 @@ export const getMemoryByIdFn = createServerFn({ method: "GET" })
         },
       },
     });
+    if (!memoryL) {
+      throw notFound();
+    }
+    if (memoryL.status === "archived") {
+      throw notFound();
+    }
     if (memoryL?.memories) {
       memoryL.memories = convertMemoryImagesToUrls(memoryL.memories);
     }
@@ -100,7 +113,10 @@ export const getUserMemoriesFnPaginated = createServerFn({
     const { page, limit, userId } = data;
 
     const offset = (page - 1) * limit;
-    const whereCondtions = [eq(memoryLane.userId, userId)];
+    const whereCondtions = [
+      eq(memoryLane.userId, userId),
+      ne(memoryLane.status, "archived"),
+    ];
     if (context.user?.id !== userId) {
       whereCondtions.push(eq(memoryLane.status, "published"));
     }

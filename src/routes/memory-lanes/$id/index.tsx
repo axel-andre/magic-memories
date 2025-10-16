@@ -22,9 +22,11 @@ import {
 } from "~/utils/server/memories/delete";
 import { usePublicationState } from "~/hooks/usePublicationState";
 import { MemoryLaneDeletionModal } from "~/components/MemoryLaneDeletionModal";
+import { Skeleton } from "~/components/ui/skeleton";
 
 export const Route = createFileRoute("/memory-lanes/$id/")({
   component: RouteComponent,
+  pendingComponent: MemoryLanePending,
   beforeLoad: async ({ context, params, search }) => {
     const { id } = params;
     const { editing } = search;
@@ -52,6 +54,59 @@ export const Route = createFileRoute("/memory-lanes/$id/")({
     editing: z.boolean().optional().default(false),
   }),
 });
+
+function MemoryLanePending() {
+  return (
+    <div className="max-w-4xl mt-8 mx-auto">
+      {/* Header skeleton */}
+      <div className="space-y-4 mb-8">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-64 bg-white" />
+            <Skeleton className="h-4 w-48 bg-white" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-20 bg-white" />
+            <Skeleton className="h-9 w-24 bg-white" />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-8 w-16 bg-white" />
+          <Skeleton className="h-8 w-20 bg-white" />
+          <Skeleton className="h-8 w-24 bg-white" />
+        </div>
+      </div>
+
+      {/* Content skeleton */}
+      <div className="flex gap-20 justify-center w-full">
+        {/* Gallery skeleton */}
+        <div className="space-y-4">
+          <div className="grid grid-cols-3 gap-4">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <Skeleton key={index} className="h-48 w-32 bg-white" />
+            ))}
+          </div>
+        </div>
+
+        {/* Details panel skeleton */}
+        <div className="w-80 space-y-4">
+          <div className="space-y-3">
+            <Skeleton className="h-6 w-full bg-white" />
+            <Skeleton className="h-4 w-3/4 bg-white" />
+            <Skeleton className="h-4 w-1/2 bg-white" />
+            <div className="space-y-2">
+              <Skeleton className="h-20 w-full bg-white" />
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-8 w-16 bg-white" />
+              <Skeleton className="h-8 w-20 bg-white" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function RouteComponent() {
   const { id } = Route.useParams();
@@ -148,19 +203,11 @@ function RouteComponent() {
 
   const handleDeleteSuccess = useCallback(() => {
     setShowDeleteModal(false);
-    // Navigate to home after successful deletion
     navigate({ to: "/" });
   }, [navigate]);
 
-  const handleMemoryChange = useCallback((values: MemoryDetailsFormValues) => {
-    // Handle memory changes
-  }, []);
-
-  const handleMemorySubmit = useCallback(() => {
-    // Handle memory submission
-  }, []);
   if (!data) {
-    return <div>Loading...</div>;
+    return <MemoryLanePending />;
   }
 
   return (
@@ -197,11 +244,9 @@ function RouteComponent() {
               memoryLaneId={id}
               isEditing={editing}
               isPending={isPending}
-              onMemoryChange={handleMemoryChange}
-              onMemorySubmit={handleMemorySubmit}
               onMemoryDelete={() => {
                 deleteMemory({
-                  data: { memoryId: currentMemory.id, memoryLaneId: id },
+                  data: { memoryId: currentMemory.id },
                 });
               }}
             />

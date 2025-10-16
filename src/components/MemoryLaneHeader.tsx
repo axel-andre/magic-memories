@@ -1,5 +1,5 @@
 import React, { memo, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Plus, Pencil, Trash } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -41,7 +41,6 @@ export const MemoryLaneHeader = memo<MemoryLaneHeaderProps>(
     onStatusChange,
     isStatusChanging = false,
   }) => {
-    const [showEditDialog, setShowEditDialog] = useState(false);
     const form = useForm({
       defaultValues: {
         title: memoryLane.name,
@@ -50,18 +49,14 @@ export const MemoryLaneHeader = memo<MemoryLaneHeaderProps>(
         onSave(value.title);
       },
     });
+    const navigate = useNavigate();
 
     const handleEditDetails = () => {
-      setShowEditDialog(true);
-    };
-
-    const handleEditDialogClose = () => {
-      setShowEditDialog(false);
-    };
-
-    const handleEditDialogSave = (name: string) => {
-      onSave(name);
-      setShowEditDialog(false);
+      navigate({
+        to: "/memory-lanes/$id",
+        params: { id: memoryLane.id },
+        search: { editing: true },
+      });
     };
 
     return (
@@ -77,7 +72,6 @@ export const MemoryLaneHeader = memo<MemoryLaneHeaderProps>(
                     {memoryLane.name}
                   </h1>
                   <PublicationControls
-                    memoryLaneId={memoryLane.id}
                     currentStatus={memoryLane.status}
                     isOwner={isOwner}
                     onStatusChange={onStatusChange}
@@ -142,30 +136,9 @@ export const MemoryLaneHeader = memo<MemoryLaneHeaderProps>(
               <Button onClick={onAddMemory} variant="default" size="sm">
                 <Plus className="h-4 w-4 mr-2" /> Add Memory
               </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link
-                  to="/memory-lanes/$id"
-                  params={{ id: memoryLane.id }}
-                  search={{ editing: true }}
-                >
-                  <Pencil className="h-4 w-4 mr-2" /> Edit
-                </Link>
-              </Button>
-              <Button variant="destructive" size="sm" onClick={onDelete}>
-                <Trash className="h-4 w-4 mr-2" /> Delete
-              </Button>
             </div>
           )}
         </div>
-
-        <MemoryLaneEditDialog
-          isOpen={showEditDialog}
-          onClose={handleEditDialogClose}
-          currentName={memoryLane.name}
-          currentStatus={memoryLane.status}
-          onSave={handleEditDialogSave}
-          isLoading={isStatusChanging}
-        />
       </div>
     );
   }

@@ -7,6 +7,7 @@ import { assertMemoryLaneOwner } from "./middlewares";
 import { db } from "../db";
 import { memoryLane } from "~/db/memory-lane-schema";
 import { updateMemoryLaneSchema, publishMemoryLaneSchema } from "./schemas";
+import { AuthorizationError, ValidationError } from "~/utils/errors";
 
 export const updateMemoryLaneFn = createServerFn({ method: "POST" })
   .inputValidator(updateMemoryLaneSchema)
@@ -24,7 +25,10 @@ export const updateMemoryLaneFn = createServerFn({ method: "POST" })
     }
 
     if (existingMemoryLane.userId !== user.id) {
-      throw new Error("Unauthorized");
+      throw new AuthorizationError(
+        "Unauthorized",
+        "You don't own this memory lane"
+      );
     }
 
     // Prepare update data
@@ -68,7 +72,10 @@ export const publishMemoryLaneFn = createServerFn({ method: "POST" })
     }
 
     if (existingMemoryLane.userId !== user.id) {
-      throw new Error("Unauthorized");
+      throw new AuthorizationError(
+        "Unauthorized",
+        "You don't own this memory lane"
+      );
     }
 
     // Check if memory lane has at least one memory before publishing
@@ -76,7 +83,10 @@ export const publishMemoryLaneFn = createServerFn({ method: "POST" })
       !existingMemoryLane.memories ||
       existingMemoryLane.memories.length === 0
     ) {
-      throw new Error("Cannot publish a memory lane without any memories");
+      throw new ValidationError(
+        "Cannot publish a memory lane without any memories",
+        "You cannot publish a memory lane without any memories"
+      );
     }
 
     const updatedMemoryLane = await db
@@ -107,7 +117,10 @@ export const unpublishMemoryLaneFn = createServerFn({ method: "POST" })
     }
 
     if (existingMemoryLane.userId !== user.id) {
-      throw new Error("Unauthorized");
+      throw new AuthorizationError(
+        "Unauthorized",
+        "You don't own this memory lane"
+      );
     }
 
     const updatedMemoryLane = await db
@@ -138,7 +151,10 @@ export const archiveMemoryLaneFn = createServerFn({ method: "POST" })
     }
 
     if (existingMemoryLane.userId !== user.id) {
-      throw new Error("Unauthorized");
+      throw new AuthorizationError(
+        "Unauthorized",
+        "You don't own this memory lane"
+      );
     }
 
     const updatedMemoryLane = await db

@@ -94,15 +94,18 @@ export const MemoryLaneEditDialog = memo<MemoryLaneEditDialogProps>(({
           )}
         </form.Field>
 
+        {}
         <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
           <span className="text-sm font-medium">Current Status:</span>
-          <span className={`text-sm px-2 py-1 rounded-full ${
-            currentStatus === "published" 
-              ? "bg-green-100 text-green-800" 
-              : currentStatus === "draft"
-              ? "bg-yellow-100 text-yellow-800"
-              : "bg-gray-100 text-gray-600"
-          }`}>
+          <span
+            className={`text-sm px-2 py-1 rounded-full ${
+              currentStatus === "published"
+                ? "bg-green-100 text-green-800"
+                : currentStatus === "draft"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-gray-100 text-gray-600"
+            }`}
+          >
             {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}
           </span>
         </div>

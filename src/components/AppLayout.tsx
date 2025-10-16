@@ -1,43 +1,59 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { Compass, Heart, LogOut, Plus, Settings, Share, User } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { Button } from '~/components/ui/button'
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu'
-import { authClient } from '~/utils/auth'
-import { CreateMemoryModal } from './CreateMemoryModal'
+  Compass,
+  Heart,
+  LogIn,
+  LogOut,
+  Plus,
+  Settings,
+  Share,
+  User,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
+import { authClient } from "~/utils/auth";
+import { CreateMemoryModal } from "./CreateMemoryModal";
 
 interface AppLayoutProps {
-    children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-    const session = authClient.useSession()
-    const navigate = useNavigate()
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const session = authClient.useSession();
+  const navigate = useNavigate();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    const handleSignOut = async () => {
-        await authClient.signOut()
-    }
+  const handleSignOut = async () => {
+    await authClient.signOut();
+  };
 
-    const getInitials = (name?: string | null) => {
-        if (!name) return 'U'
-        return name
-            .split(' ')
-            .map((n) => n[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2)
-    }
+  const getInitials = (name?: string | null) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
-    return (
+  return (
+    <TooltipProvider>
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="sticky top-4 z-50 w-fit mx-auto rounded-md backdrop-blur bg-white">
@@ -78,7 +94,6 @@ export function AppLayout({ children }: AppLayoutProps) {
                 Share my memories
               </Button>
             </div>
-            {/* Profile Section */}
             <div className="flex items-center gap-4 ml-4">
               {session.data ? (
                 <DropdownMenu>
@@ -120,6 +135,25 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : null}
+              {!session.data ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      asChild
+                      size="icon"
+                      variant="outline"
+                      className="p-2"
+                    >
+                      <Link to="/sign-in">
+                        <LogIn className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-white text-black drop-shadow-md">
+                    <p>Sign in to your account</p>
+                  </TooltipContent>
+                </Tooltip>
+              ) : null}
             </div>
           </div>
         </header>
@@ -130,6 +164,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           onOpenChange={setIsCreateModalOpen}
         />
       </div>
-    );
+    </TooltipProvider>
+  );
 }
 

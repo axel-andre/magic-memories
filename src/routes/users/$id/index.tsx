@@ -4,17 +4,50 @@ import { getUserMemoriesInfiniteQueryOptions, getUserMemoriesQueryOptions } from
 import { getUserByIdPublicQueryOptions } from '~/utils/server/users';
 import { useQuery } from '@tanstack/react-query';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { Skeleton } from "~/components/ui/skeleton";
 
-export const Route = createFileRoute('/users/$id/')({
+export const Route = createFileRoute("/users/$id/")({
   component: UserProfile,
+  pendingComponent: UserProfilePending,
   loader: async ({ context, params }) => {
     const { id } = params;
     await Promise.all([
-      context.queryClient.ensureInfiniteQueryData(getUserMemoriesInfiniteQueryOptions(id, 9)),
+      context.queryClient.ensureInfiniteQueryData(
+        getUserMemoriesInfiniteQueryOptions(id, 9)
+      ),
       context.queryClient.ensureQueryData(getUserByIdPublicQueryOptions(id)),
     ]);
   },
-})
+});
+
+function UserProfilePending() {
+  return (
+    <div className="max-w-4xl mx-auto space-y-6 pt-12">
+      <div className="space-y-2">
+        <div className="flex items-center space-x-4">
+          <Skeleton className="h-20 w-20 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+      </div>
+      {/* User memories skeleton */}
+      <div className="space-y-2 pt-12">
+        <div className="flex flex-wrap gap-4 gap-y-20 w-full justify-between">
+          {Array.from({ length: 9 }).map((_, index) => (
+            <div key={index} className="max-w-60 max-h-80">
+              <Skeleton className="h-60 w-60 bg-white" />
+              <div className="mt-2">
+                <Skeleton className="h-4 w-40" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function UserProfile() {
   const { id } = Route.useParams();

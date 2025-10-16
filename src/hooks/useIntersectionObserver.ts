@@ -28,7 +28,7 @@ interface UseIntersectionObserverReturn {
   /**
    * Ref to attach to the element you want to observe
    */
-  ref: RefObject<HTMLElement>;
+  ref: RefObject<HTMLElement | null>;
   /**
    * Whether the element is currently intersecting
    */
@@ -74,7 +74,7 @@ export function useIntersectionObserver(
     triggerOnce = false,
   } = options;
 
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLElement | null>(null);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [intersectionRatio, setIntersectionRatio] = useState(0);
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);

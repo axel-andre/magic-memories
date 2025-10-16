@@ -13,6 +13,8 @@ import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { createMemoryLaneFn } from "~/utils/server/memories";
+import { ErrorAlert } from "./ui/ErrorAlert";
+import { getUserErrorMessage } from "~/utils/errors";
 
 interface CreateMemoryModalProps {
   open: boolean;
@@ -50,8 +52,8 @@ export function CreateMemoryModal({
           params: { id: newMemory.id },
           search: { editing: true },
         });
-      } catch (err: any) {
-        setError(err.message || "Failed to create memory. Please try again.");
+      } catch (err: unknown) {
+        setError(getUserErrorMessage(err));
       } finally {
         setIsSubmitting(false);
       }
@@ -116,11 +118,7 @@ export function CreateMemoryModal({
             )}
           </form.Field>
 
-          {error && (
-            <div className="p-3 border border-destructive/50 bg-destructive/10 rounded-lg mx-auto">
-              <p className="text-sm text-destructive">{error}</p>
-            </div>
-          )}
+          {error && <ErrorAlert message={error} />}
 
           <DialogFooter>
             <Button

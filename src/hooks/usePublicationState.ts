@@ -109,48 +109,65 @@ export const usePublicationState = ({
     },
   });
 
-  const changeStatus = useCallback((newStatus: "draft" | "published" | "archived") => {
-    switch (newStatus) {
-      case "published":
-        if (currentStatus !== "published") {
-          publishMutation.mutate({ data: { id: memoryLaneId } });
-        }
-        break;
-      case "draft":
-        if (currentStatus === "published") {
-          unpublishMutation.mutate({ data: { id: memoryLaneId } });
-        } else if (currentStatus === "archived") {
-          updateMutation.mutate({ 
-            data: { 
-              id: memoryLaneId, 
-              status: "draft" 
-            } 
-          });
-        }
-        break;
-      case "archived":
-        if (currentStatus !== "archived") {
-          archiveMutation.mutate({ data: { id: memoryLaneId } });
-        }
-        break;
-    }
-  }, [
-    currentStatus,
-    memoryLaneId,
-    publishMutation,
-    unpublishMutation,
-    archiveMutation,
-    updateMutation,
-  ]);
+  const changeStatus = useCallback(
+    (newStatus: "draft" | "published" | "archived") => {
+      switch (newStatus) {
+        case "published":
+          if (currentStatus !== "published") {
+            publishMutation.mutate({
+              data: { id: memoryLaneId, memoryLaneId },
+            });
+          }
+          break;
+        case "draft":
+          if (currentStatus === "published") {
+            unpublishMutation.mutate({
+              data: { id: memoryLaneId, memoryLaneId },
+            });
+          } else if (currentStatus === "archived") {
+            updateMutation.mutate({
+              data: {
+                id: memoryLaneId,
+                memoryLaneId,
+                status: "draft",
+              },
+            });
+          }
+          break;
+        case "archived":
+          if (currentStatus !== "archived") {
+            archiveMutation.mutate({
+              data: { id: memoryLaneId, memoryLaneId },
+            });
+          }
+          break;
+      }
+    },
+    [
+      currentStatus,
+      memoryLaneId,
+      publishMutation,
+      unpublishMutation,
+      archiveMutation,
+      updateMutation,
+    ]
+  );
 
-  const updateMemoryLane = useCallback((updates: { name?: string; status?: "draft" | "published" | "archived" }) => {
-    updateMutation.mutate({
-      data: {
-        id: memoryLaneId,
-        ...updates,
-      },
-    });
-  }, [memoryLaneId, updateMutation]);
+  const updateMemoryLane = useCallback(
+    (updates: {
+      name?: string;
+      status?: "draft" | "published" | "archived";
+    }) => {
+      updateMutation.mutate({
+        data: {
+          id: memoryLaneId,
+          memoryLaneId,
+          ...updates,
+        },
+      });
+    },
+    [memoryLaneId, updateMutation]
+  );
 
   return {
     isLoading: isLoading || publishMutation.isPending || unpublishMutation.isPending || archiveMutation.isPending || updateMutation.isPending,

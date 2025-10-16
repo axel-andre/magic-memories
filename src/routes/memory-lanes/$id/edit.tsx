@@ -28,18 +28,14 @@ function RouteComponent() {
   return (
     <div className="container max-w-2xl mx-auto py-10">
       {memoryLane && (
-        <Dialog>
-          <DialogTrigger>
-            <Button variant="default" size="sm"><Plus className="h-4 w-4" /> Edit</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <MemoryAdditionDialog.Header title={memoryLane?.name} description="Edit the memory with photos, descriptions, and dates." />
-              <MemoryAdditionDialog id={id} />
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
+        <MemoryAdditionDialog
+          id={id}
+          isOpen={true}
+          onClose={() => {}}
+          title={memoryLane?.name}
+          description="Edit the memory with photos, descriptions, and dates."
+        />
       )}
     </div>
-  )
+  );
 }

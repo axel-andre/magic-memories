@@ -2,11 +2,11 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { getAllMemoriesInfiniteQueryOptions } from "~/utils/server/memories";
 import { Polaroid } from "./Polaroid";
-import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 
 export const MemoryLanesFeed = () => {
-  const [limit, setLimit] = useState(9);
+  const limit = 9;
   const {
     data,
     isLoading,
@@ -17,32 +17,14 @@ export const MemoryLanesFeed = () => {
     isFetchingNextPage,
   } = useInfiniteQuery(getAllMemoriesInfiniteQueryOptions(limit));
 
-  const observerRef = useRef<HTMLDivElement>(null);
+  const { observerRef } = useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
+
   // Flatten all pages into a single array
   const memories = data?.pages.flat() ?? [];
-  useEffect(() => {
-    const currentObserverRef = observerRef.current;
-
-    if (!currentObserverRef) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0];
-        if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    observer.observe(currentObserverRef);
-
-    return () => {
-      if (currentObserverRef) {
-        observer.unobserve(currentObserverRef);
-      }
-    };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return (

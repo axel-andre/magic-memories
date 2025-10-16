@@ -11,18 +11,19 @@ import {
 import { Polaroid } from "./Polaroid";
 import { PublicationStatusBadge } from "./ui/PublicationStatusBadge";
 import { Button } from "./ui/button";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { authClient } from "~/utils/auth";
 import { Trash2 } from "lucide-react";
 import { MemoryLaneDeletionModal } from "./MemoryLaneDeletionModal";
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 
 interface UserProfileFeedProps {
   userId: string;
 }
 
 export const UserProfileFeed = ({ userId }: UserProfileFeedProps) => {
-  const [limit, setLimit] = useState(9);
+  const [limit] = useState(9);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedMemoryLane, setSelectedMemoryLane] = useState<{
     id: string;
@@ -68,32 +69,14 @@ export const UserProfileFeed = ({ userId }: UserProfileFeedProps) => {
     setSelectedMemoryLane(null);
   };
 
-  const observerRef = useRef<HTMLDivElement>(null);
+  const { observerRef } = useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
+
   // Flatten all pages into a single array
   const memories = data?.pages.flat() ?? [];
-  useEffect(() => {
-    const currentObserverRef = observerRef.current;
-
-    if (!currentObserverRef) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0];
-        if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 1.0 }
-    );
-
-    observer.observe(currentObserverRef);
-
-    return () => {
-      if (currentObserverRef) {
-        observer.unobserve(currentObserverRef);
-      }
-    };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return (
@@ -166,7 +149,10 @@ export const UserProfileFeed = ({ userId }: UserProfileFeedProps) => {
                     </Polaroid.SubCaption>
                     {isOwner && (
                       <div className="mt-2 flex flex-col items-center gap-2">
-                        <PublicationStatusBadge status={memory.status} />
+                        <PublicationStatusBadge
+                          isOwner={isOwner}
+                          status={memory.status}
+                        />
                       </div>
                     )}
                     {isOwner && (

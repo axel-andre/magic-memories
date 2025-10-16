@@ -16,133 +16,121 @@ export type MemoryDetailsFormValues = {
 };
 
 export type MemoryDetailsFormProps = {
-    memoryLaneId: string;
-    id: string;
-    values: MemoryDetailsFormValues;
-    onChange: (values: MemoryDetailsFormValues) => void;
-    onDelete: () => void;
-    onSubmit?: () => void;
-    submitLabel?: string;
-    isSubmitting?: boolean;
+  memoryLaneId: string;
+  id: string;
+  values: MemoryDetailsFormValues;
+  onDelete: () => void;
+  isSubmitting?: boolean;
 };
 
 export function MemoryDetailsForm({
-    memoryLaneId,
-    id,
-    values,
-    onDelete,
-    onSubmit,
-    submitLabel = "Save",
-    isSubmitting,
+  memoryLaneId,
+  id,
+  values,
+  onDelete,
+  isSubmitting,
 }: MemoryDetailsFormProps) {
-    const queryClient = useQueryClient();
-    const titleId = useId();
-    const dateId = useId();
-    const contentId = useId();
-    const updateMemoryMutation = useMutation({
-        mutationFn: updateMemoryFn,
-        onSuccess: () => {
-            queryClient.invalidateQueries(getMemoryByIdQueryOptions(memoryLaneId));
+  const queryClient = useQueryClient();
+  const titleId = useId();
+  const dateId = useId();
+  const contentId = useId();
+  const updateMemoryMutation = useMutation({
+    mutationFn: updateMemoryFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries(getMemoryByIdQueryOptions(memoryLaneId));
+    },
+  });
+  const form = useForm({
+    defaultValues: {
+      title: values.title,
+      date: new Date(values.date ?? new Date()).toISOString().split("T")[0],
+      content: values.content,
+    },
+    onSubmit: async ({ value, formApi }) => {
+      if (!id) {
+        throw new Error("Id is required");
+      }
+      await updateMemoryMutation.mutateAsync({
+        data: {
+          id,
+          title: value.title,
+          date: value.date,
+          content: value.content,
         },
-    })
-    const form = useForm({
-        defaultValues: {
-            title: values.title,
-            date: new Date(values.date ?? new Date()).toISOString().split('T')[0],
-            content: values.content,
-        },
-        onSubmit: async ({ value, formApi }) => {
-            if (!id) {
-                throw new Error("Id is required");
-            }
-            await updateMemoryMutation.mutateAsync({
-                data: {
-                    id,
-                    title: value.title,
-                    date: value.date,
-                    content: value.content,
-                },
-            })
-        },
-    })
-    return (
-        <form
-            onSubmit={form.handleSubmit}
-            className="w-full sticky top-28"
-        >
-            <Card className="w-full bg-white">
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">Memory</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid gap-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor={titleId}>Title</Label>
-                            <form.Field
-                                name="title"
-                                children={(field) => (
-                                    <Input
-                                        value={field.state.value}
-                                        onChange={(e) => field.handleChange(e.target.value)}
-                                        placeholder="A special moment"
-                                        required
-                                    />
-                                )}>
-                            </form.Field>
+      });
+    },
+  });
+  return (
+    <form onSubmit={form.handleSubmit} className="w-full sticky top-28">
+      <Card className="w-full bg-white">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl">Memory</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor={titleId}>Title</Label>
+              <form.Field
+                name="title"
+                children={(field) => (
+                  <Input
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="A special moment"
+                    required
+                  />
+                )}
+              ></form.Field>
+            </div>
 
-                        </div>
+            <div className="grid gap-2">
+              <Label htmlFor={dateId}>Date</Label>
+              <form.Field
+                name="date"
+                children={(field) => (
+                  <Input
+                    type="date"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                )}
+              ></form.Field>
+            </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor={dateId}>Date</Label>
-                            <form.Field
-                                name="date"
-                                children={(field) => (
-                                    <Input
-                                        type="date"
-                                        value={field.state.value}
-                                        onChange={(e) => field.handleChange(e.target.value)}
-                                    />
-                                )}>
-                            </form.Field>
+            <div className="grid gap-2">
+              <Label htmlFor={contentId}>Content</Label>
+              <form.Field
+                name="content"
+                children={(field) => (
+                  <Textarea
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                )}
+              ></form.Field>
+            </div>
 
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor={contentId}>Content</Label>
-                            <form.Field
-                                name="content"
-                                children={(field) => (
-                                    <Textarea
-                                        value={field.state.value}
-                                        onChange={(e) => field.handleChange(e.target.value)}
-                                    />
-                                )}>
-                            </form.Field>
-                        </div>
-
-                        {onSubmit ? (
-                            <div className="flex justify-end">
-                                <Button
-                                    type="button"
-                                    variant="destructive"
-                                    onClick={() => onDelete()}
-                                    className="mr-2"
-                                    disabled={isSubmitting}
-                                >
-                                    Delete
-                                </Button>
-                                <Button
-                                    type="button"
-                                    onClick={form.handleSubmit}
-                                    disabled={isSubmitting}
-                                >
-                                    {submitLabel}
-                                </Button>
-                            </div>
-                        ) : null}
-                    </div>
-                </CardContent>
-            </Card>
-        </form>
-    );
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => onDelete()}
+                className="mr-2"
+                disabled={isSubmitting}
+              >
+                Delete
+              </Button>
+              <Button
+                type="button"
+                onClick={form.handleSubmit}
+                disabled={isSubmitting}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </form>
+  );
 }

@@ -24,12 +24,37 @@ export const createMemorySchema = z.object({
   title: z.string().min(3).max(100),
   content: z.string().min(3).max(1000),
   date: z.string(),
-  file: z.object({
-    data: z.string(),
-    type: z.string(),
-    name: z.string(),
-    size: z.number(),
-  }),
+  file: z
+    .object({
+      data: z.string(),
+      type: z.string(),
+      name: z.string(),
+      size: z.number(),
+    })
+    .refine(
+      (file) => {
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        return file.size <= MAX_FILE_SIZE;
+      },
+      {
+        message: "File size must be less than 5MB",
+      }
+    )
+    .refine(
+      (file) => {
+        const ALLOWED_TYPES = [
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+        ];
+        return ALLOWED_TYPES.includes(file.type);
+      },
+      {
+        message: "File type must be JPEG, PNG, GIF, or WebP",
+      }
+    ),
 });
 
 export const updateMemorySchema = z.object({

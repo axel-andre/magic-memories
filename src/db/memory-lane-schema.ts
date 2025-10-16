@@ -2,7 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { user } from "./auth-schema";
 
-const memoryLaneStatus = {
+export const memoryLaneStatus = {
   DRAFT: "draft",
   PUBLISHED: "published",
   ARCHIVED: "archived",
@@ -12,6 +12,8 @@ const status = [
   memoryLaneStatus.PUBLISHED,
   memoryLaneStatus.ARCHIVED,
 ] satisfies (typeof memoryLaneStatus)[keyof typeof memoryLaneStatus][];
+
+export type MemoryLaneStatus = (typeof status)[number];
 export const memoryLane = sqliteTable("memory_lane", {
   id: text("id")
     .primaryKey()

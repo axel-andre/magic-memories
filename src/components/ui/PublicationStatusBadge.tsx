@@ -4,11 +4,13 @@ import { Badge } from "./badge";
 interface PublicationStatusBadgeProps {
   status: "draft" | "published" | "archived";
   className?: string;
+  isOwner?: boolean;
 }
 
 export const PublicationStatusBadge: React.FC<PublicationStatusBadgeProps> = ({
   status,
   className = "",
+  isOwner = false,
 }) => {
   const getStatusConfig = () => {
     switch (status) {
@@ -40,7 +42,9 @@ export const PublicationStatusBadge: React.FC<PublicationStatusBadgeProps> = ({
   };
 
   const config = getStatusConfig();
-
+  if (!isOwner) {
+    return null;
+  }
   return (
     <Badge
       variant={config.variant}
