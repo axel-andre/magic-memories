@@ -43,7 +43,7 @@ export const UserProfileFeed = ({ userId }: UserProfileFeedProps) => {
     isFetchingNextPage,
   } = useInfiniteQuery(getUserMemoriesInfiniteQueryOptions(userId, limit));
 
-  const { mutate: deleteMemoryLane, isPending: isDeleting } = useMutation({
+  const { isPending: isDeleting } = useMutation({
     mutationFn: deleteMemoryLaneFn,
     onSuccess: () => {
       queryClient.invalidateQueries(

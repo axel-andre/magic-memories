@@ -48,14 +48,15 @@
 			"binding": "db_app",
 			"database_name": "db_app",
 			"database_id": "e59c2c60-c996-49f5-8871-dd78c51e06d1",
-			"preview_database_id": "local-test-db",
+			"remote": true,
 		}
 	],
 
 	"r2_buckets": [
 		{
 			"binding": "IMAGE_BUCKET",
-			"bucket_name": "images",
+					"bucket_name": "image-ml",
+					"remote": true,
 		}
 	]
 }

@@ -1,62 +1,68 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Button } from '~/components/ui/button'
-import { Input } from '~/components/ui/input'
-import { Label } from '~/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '~/components/ui/card'
-import { authClient } from '~/utils/auth'
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { authClient } from "~/utils/auth";
+import { AlertCircle } from "lucide-react";
+import { ErrorBox } from "~/components/ErrorBox";
 
-export const Route = createFileRoute('/sign-up')({
+export const Route = createFileRoute("/sign-up")({
   component: SignUp,
-})
+});
 
 function SignUp() {
-  const navigate = useNavigate()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
     // Validate passwords match
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError("Passwords do not match");
+      return;
     }
 
     // Validate password length
     if (password.length < 8) {
-      setError('Password must be at least 8 characters long')
-      return
+      setError("Password must be at least 8 characters long");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
-    try {
-      await authClient.signUp.email({
-        email,
-        name,
-        password,
-      })
-      // Redirect to home page after successful sign up
-      navigate({ to: '/' })
-    } catch (err: any) {
-      if (err?.message?.includes('already exists')) {
-        setError('An account with this email already exists')
-      } else if (err?.code === 'INVALID_EMAIL_OR_PASSWORD') {
-        setError('Invalid email or password format')
-      } else {
-        setError('An unexpected error occurred. Please try again.')
-      }
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    await authClient.signUp.email({
+      email,
+      name,
+      password,
+      fetchOptions: {
+        onSuccess: () => {
+          navigate({ to: "/" });
+        },
+        onError: (err) => {
+          setError(err.error.message);
+        },
+        onResponse: () => {
+          setIsLoading(false);
+        },
+      },
+    });
+  };
 
   return (
     <div className="min-h-screen flex justify-center p-4">
@@ -72,11 +78,7 @@ function SignUp() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {error && (
-              <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
-                {error}
-              </div>
-            )}
+            <ErrorBox>{error}</ErrorBox>
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -147,4 +149,3 @@ function SignUp() {
     </div>
   );
 }
-

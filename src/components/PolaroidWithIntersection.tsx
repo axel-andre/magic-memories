@@ -3,27 +3,11 @@ import { Polaroid, PolaroidProps } from './Polaroid';
 import { usePolaroidIntersection } from '~/hooks/useIntersectionObserver';
 
 interface PolaroidWithIntersectionProps extends PolaroidProps {
-    /**
-     * The threshold at which the polaroid becomes visible (0-1)
-     * @default 0.3
-     */
-    visibilityThreshold?: number;
-    /**
-     * Whether to trigger the visibility handler only once
-     * @default true
-     */
-    triggerOnce?: boolean;
-    /**
-     * Handler function called when the polaroid becomes visible
-     */
-    onVisible?: () => void;
-
+  visibilityThreshold?: number;
+  triggerOnce?: boolean;
+  onVisible?: () => void;
 }
 
-/**
- * A Polaroid component that uses intersection observer to trigger a handler
- * when it becomes visible in the viewport
- */
 export const PolaroidWithIntersection = React.forwardRef<
     HTMLDivElement,
     PolaroidWithIntersectionProps

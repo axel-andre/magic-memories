@@ -5,20 +5,22 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   createMemoryFn,
   getMemoryByIdQueryOptions,
+  memoryFormValidator,
 } from "~/utils/server/memories";
 import { fileToBase64 } from "~/utils/file";
+
+// Re-export validators for convenience
+export {
+  memoryTitleValidator as titleValidator,
+  memoryContentValidator as contentValidator,
+  memoryDateValidator as dateValidator,
+  memoryImageValidator as imageValidator,
+} from "~/utils/server/memories/schemas";
 
 interface UseMemoryFormProps {
   memoryLaneId: string;
   onSuccess?: () => void;
   onError?: (error: string) => void;
-}
-
-interface MemoryFormValues {
-  title: string;
-  content: string;
-  date: string;
-  image: File | null;
 }
 
 export const useMemoryForm = ({
@@ -27,7 +29,6 @@ export const useMemoryForm = ({
   onError,
 }: UseMemoryFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -43,7 +44,69 @@ export const useMemoryForm = ({
 
   const form = useForm({
     defaultValues: initialValues,
+    validators: {
+      onSubmit: memoryFormValidator,
+    },
+    onSubmit: async ({ value }) => {
+      setIsSubmitting(true);
+
+      try {
+        if (!value.image) {
+          throw new Error("Image is required");
+        }
+
+        const base64 = await fileToBase64(value.image);
+
+        await createMemoryFn({
+          data: {
+            memoryLaneId,
+            title: value.title,
+            content: value.content,
+            date: value.date,
+            file: {
+              data: base64,
+              type: value.image.type,
+              name: value.image.name,
+              size: value.image.size,
+            },
+          },
+        });
+
+        await queryClient.invalidateQueries(
+          getMemoryByIdQueryOptions(memoryLaneId)
+        );
+
+        // Reset form after successful submission
+        resetFormValues();
+
+        onSuccess?.();
+        navigate({ to: "/memory-lanes/$id", params: { id: memoryLaneId } });
+      } catch (err: any) {
+        const errorMsg =
+          err.message || "Failed to save memory. Please try again.";
+        onError?.(errorMsg);
+        // Re-throw to let TanStack Form handle the error
+        throw err;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
   });
+
+  const resetFormValues = useCallback(() => {
+    // Reset form values
+    form.setFieldValue("title", initialValues.title);
+    form.setFieldValue("content", initialValues.content);
+    form.setFieldValue("date", initialValues.date);
+    form.setFieldValue("image", initialValues.image);
+
+    // Reset image-related state
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setUploadedImages([]);
+    setImagePreview(null);
+  }, [form, imagePreview]);
 
   const handleImageDrop = useCallback(
     (files: File[]) => {
@@ -55,7 +118,6 @@ export const useMemoryForm = ({
         setImagePreview(previewUrl);
 
         form.setFieldValue("image", file);
-        setError(null); // Clear any previous errors
       }
     },
     [form]
@@ -71,73 +133,8 @@ export const useMemoryForm = ({
   }, [imagePreview, form]);
 
   const resetForm = useCallback(() => {
-    // Reset form values
-    form.setFieldValue("title", initialValues.title);
-    form.setFieldValue("content", initialValues.content);
-    form.setFieldValue("date", initialValues.date);
-    form.setFieldValue("image", initialValues.image);
-
-    // Reset image-related state
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    setUploadedImages([]);
-    setImagePreview(null);
-
-    // Clear any errors
-    setError(null);
-  }, [form, imagePreview]);
-
-  const handleSubmit = useCallback(
-    async (values: MemoryFormValues) => {
-      if (!values.image) {
-        const errorMsg = "Image is required";
-        setError(errorMsg);
-        onError?.(errorMsg);
-        return;
-      }
-
-      setIsSubmitting(true);
-      setError(null);
-
-      try {
-        const base64 = await fileToBase64(values.image);
-
-        await createMemoryFn({
-          data: {
-            memoryLaneId,
-            title: values.title,
-            content: values.content,
-            date: values.date,
-            file: {
-              data: base64,
-              type: values.image.type,
-              name: values.image.name,
-              size: values.image.size,
-            },
-          },
-        });
-
-        await queryClient.invalidateQueries(
-          getMemoryByIdQueryOptions(memoryLaneId)
-        );
-
-        // Reset form after successful submission
-        resetForm();
-
-        onSuccess?.();
-        navigate({ to: "/memory-lanes/$id", params: { id: memoryLaneId } });
-      } catch (err: any) {
-        const errorMsg =
-          err.message || "Failed to save memory. Please try again.";
-        setError(errorMsg);
-        onError?.(errorMsg);
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-    [memoryLaneId, imagePreview, queryClient, navigate, onSuccess, onError]
-  );
+    resetFormValues();
+  }, [resetFormValues]);
 
   const handleCancel = useCallback(() => {
     // Clean up image preview
@@ -150,12 +147,10 @@ export const useMemoryForm = ({
   return {
     form,
     isSubmitting,
-    error,
     uploadedImages,
     imagePreview,
     handleImageDrop,
     handleRemoveImage,
-    handleSubmit,
     handleCancel,
     resetForm,
   };
