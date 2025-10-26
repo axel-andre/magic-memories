@@ -4,8 +4,10 @@ export interface CreateMemoryInput {
   name: string;
 }
 
+const memoryLaneNameSchema = z.string().min(3).max(100);
+
 export const createMemoryLaneSchema = z.object({
-  name: z.string().min(3).max(100),
+  name: memoryLaneNameSchema,
 });
 
 export const memoryTitleSchema = z
@@ -26,6 +28,7 @@ export const memoryDateSchema = z.string().refine((date) => {
   return !isNaN(parsedDate.getTime());
 }, "Valid date is required");
 
+// Client-side: validates File objects in the browser
 export const memoryImageFileSchema = z
   .custom<File | null>()
   .refine((file) => file !== null, "Image is required")
@@ -45,6 +48,39 @@ export const memoryImageFileSchema = z
     ];
     return ALLOWED_TYPES.includes(file.type);
   }, "Image must be JPEG, PNG, GIF, or WebP");
+
+// Server-side: validates file data sent to API (base64 encoded)
+const serverFileSchema = z
+  .object({
+    data: z.string(),
+    type: z.string(),
+    name: z.string(),
+    size: z.number(),
+  })
+  .refine(
+    (file) => {
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+      return file.size <= MAX_FILE_SIZE;
+    },
+    {
+      message: "File size must be less than 5MB",
+    }
+  )
+  .refine(
+    (file) => {
+      const ALLOWED_TYPES = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+      ];
+      return ALLOWED_TYPES.includes(file.type);
+    },
+    {
+      message: "File type must be JPEG, PNG, GIF, or WebP",
+    }
+  );
 
 function createFieldValidator<T>(schema: z.ZodType<T>) {
   return ({ value }: { value: T }) => {
@@ -100,28 +136,31 @@ export const memoryLaneIdSchema = z.object({
   id: z.string(),
 });
 
+// Server-side schema for creating memories (used by API)
 export const createMemorySchema = z.object({
   memoryLaneId: z.string(),
   title: memoryTitleSchema,
   content: memoryContentSchema,
   date: memoryDateSchema,
-  image: memoryImageFileSchema,
+  file: serverFileSchema,
 });
 
 export type CreateMemorySchema = z.infer<typeof createMemorySchema>;
+
 export const updateMemorySchema = z.object({
   id: z.string(),
-  title: memoryTitleSchema,
-  content: memoryContentSchema,
-  date: memoryDateSchema,
-  file: memoryImageFileSchema,
+  title: memoryTitleSchema.optional(),
+  content: memoryContentSchema.optional(),
+  date: memoryDateSchema.optional(),
+  file: serverFileSchema.optional(),
 });
 
 const memoryLaneStatusSchema = z.enum(["draft", "published", "archived"]);
 export type MemoryLaneStatus = z.infer<typeof memoryLaneStatusSchema>;
+
 export const updateMemoryLaneSchema = z.object({
   id: z.string(),
-  name: memoryTitleSchema,
+  name: memoryLaneNameSchema.optional(),
   status: memoryLaneStatusSchema.optional(),
 });
 
