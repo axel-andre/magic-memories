@@ -10,7 +10,7 @@ import { db } from "../db";
 import { auth } from "../auth";
 
 import { paginationSchema, memoryLaneIdSchema } from "./schemas";
-import { requireAuthed } from "../users/middlewares";
+import { checkAuthOrPublic } from "../users/middlewares";
 import { notFound } from "@tanstack/react-router";
 import { AuthorizationError } from "~/utils/errors";
 
@@ -107,7 +107,7 @@ export const getMemoryByIdFn = createServerFn({ method: "GET" })
 export const getUserMemoriesFnPaginated = createServerFn({
   method: "GET",
 })
-  .middleware([requireAuthed])
+  .middleware([checkAuthOrPublic])
   .inputValidator(paginationSchema.extend({ userId: z.string() }))
   .handler(async ({ data, context }) => {
     const { page, limit, userId } = data;

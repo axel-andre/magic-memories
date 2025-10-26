@@ -3,8 +3,13 @@ import { Button } from "./ui/button";
 import { BaseDialog } from "./ui/BaseDialog";
 import { FormField } from "./ui/FormField";
 import { ImageUpload } from "./ui/ImageUpload";
-import { useMemoryForm } from "~/hooks/useMemoryForm";
-
+import {
+  useMemoryForm,
+  titleValidator,
+  contentValidator,
+  dateValidator,
+  imageValidator,
+} from "~/hooks/useMemoryForm";
 interface MemoryAdditionDialogProps {
   id: string;
   isOpen: boolean;
@@ -24,20 +29,14 @@ export const MemoryAdditionDialog = memo<MemoryAdditionDialogProps>(
     const {
       form,
       isSubmitting,
-      error,
       uploadedImages,
       imagePreview,
       handleImageDrop,
       handleRemoveImage,
-      handleSubmit,
-      handleCancel,
       resetForm,
     } = useMemoryForm({
       memoryLaneId: id,
       onSuccess: onClose,
-      onError: (error) => {
-        // Handle memory creation error
-      },
     });
 
     // Reset form when dialog is closed
@@ -46,15 +45,14 @@ export const MemoryAdditionDialog = memo<MemoryAdditionDialogProps>(
         resetForm();
       }
     }, [isOpen, resetForm]);
+
     const handleFormSubmit = useCallback(
       async (e: React.FormEvent) => {
         e.preventDefault();
         e.stopPropagation();
-
-        const values = form.state.values;
-        await handleSubmit(values);
+        await form.handleSubmit();
       },
-      [form.state.values, handleSubmit]
+      [form]
     );
 
     return (
@@ -69,18 +67,7 @@ export const MemoryAdditionDialog = memo<MemoryAdditionDialogProps>(
           <form.Field
             name="title"
             validators={{
-              onChange: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return "Title is required";
-                }
-                if (value.length < 3) {
-                  return "Title must be at least 3 characters";
-                }
-                if (value.length > 100) {
-                  return "Title must be less than 100 characters";
-                }
-                return undefined;
-              },
+              onChange: titleValidator,
             }}
           >
             {(field) => (
@@ -102,12 +89,7 @@ export const MemoryAdditionDialog = memo<MemoryAdditionDialogProps>(
           <form.Field
             name="date"
             validators={{
-              onChange: ({ value }) => {
-                if (!value) {
-                  return "Date is required";
-                }
-                return undefined;
-              },
+              onChange: dateValidator,
             }}
           >
             {(field) => (
@@ -128,18 +110,7 @@ export const MemoryAdditionDialog = memo<MemoryAdditionDialogProps>(
           <form.Field
             name="content"
             validators={{
-              onChange: ({ value }) => {
-                if (!value || value.trim().length === 0) {
-                  return "Description is required";
-                }
-                if (value.length < 10) {
-                  return "Description must be at least 10 characters";
-                }
-                if (value.length > 1000) {
-                  return "Description must be less than 1000 characters";
-                }
-                return undefined;
-              },
+              onChange: contentValidator,
             }}
           >
             {(field) => (
@@ -163,12 +134,7 @@ export const MemoryAdditionDialog = memo<MemoryAdditionDialogProps>(
           <form.Field
             name="image"
             validators={{
-              onChange: ({ value }) => {
-                if (!value) {
-                  return "Image is required";
-                }
-                return undefined;
-              },
+              onChange: imageValidator,
             }}
           >
             {(field) => (
@@ -185,13 +151,14 @@ export const MemoryAdditionDialog = memo<MemoryAdditionDialogProps>(
             )}
           </form.Field>
 
-          {error && (
-            <div className="p-3 border border-destructive/50 bg-destructive/10 rounded-lg">
-              <p className="text-sm text-destructive" role="alert">
-                {error}
-              </p>
-            </div>
-          )}
+          {form.state.submissionAttempts > 0 &&
+            form.state.errorMap?.onSubmit && (
+              <div className="p-3 border border-destructive/50 bg-destructive/10 rounded-lg">
+                <p className="text-sm text-destructive" role="alert">
+                  {form.state.errorMap.onSubmit}
+                </p>
+              </div>
+            )}
 
           <div className="flex gap-2 pt-4">
             <Button

@@ -141,12 +141,6 @@ function RouteComponent() {
   } = usePublicationState({
     memoryLaneId: id,
     currentStatus: data?.status || "draft",
-    onSuccess: (newStatus) => {
-      // Status changed successfully
-    },
-    onError: (error) => {
-      // Handle status change error
-    },
   });
 
   // Memoized computed values
@@ -163,9 +157,7 @@ function RouteComponent() {
     [data?.memories, selectedMemory]
   );
 
-  // Event handlers
   const handleEdit = useCallback(() => {
-    // Navigate to edit mode
     navigate({
       to: "/memory-lanes/$id",
       params: { id },
